@@ -91,9 +91,9 @@ local hexColor = function(r, g, b)
 			r, g, b = unpack(r)
 		end
 	end
-    
 	return string.format("|cff%02x%02x%02x", r*255, g*255, b*255)
 end
+
 -- ------------------------------------------------------------------------
 -- level update
 -- ------------------------------------------------------------------------
@@ -414,7 +414,6 @@ local func = function(self, unit)
 		-- oUF_BarFader
 		--
 		self.BarFade = true
-		self.BarFadeAlpha = 0.2
 	end
 
 	-- ------------------------------------
@@ -446,7 +445,6 @@ local func = function(self, unit)
 		-- oUF_BarFader
 		--
 		self.BarFade = true
-		self.BarFadeAlpha = 0.2
 	end
 
 	-- ------------------------------------
@@ -542,7 +540,6 @@ local func = function(self, unit)
 		--
 		if unit=="focus" then
 			self.BarFade = true
-			self.BarFadeAlpha = 0.2
 		end
 	end
 
@@ -606,8 +603,6 @@ local func = function(self, unit)
 	    self.Castbar.Time:SetTextColor(1, 1, 1)
 	    self.Castbar.Time:SetJustifyH('RIGHT')
 	end
-
-
 
 	-- ------------------------------------
 	-- party
@@ -706,9 +701,9 @@ end
 --
 -- normal frames
 --
-oUF:RegisterStyle("Lyn", func)
+oUF:RegisterStyle("Blomma", func)
 
-oUF:SetActiveStyle("Lyn")
+oUF:SetActiveStyle("Blomma")
 local player = oUF:Spawn("player", "oUF_Player")
 player:SetPoint("CENTER", -280, -106)
 local target = oUF:Spawn("target", "oUF_Target")
