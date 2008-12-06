@@ -103,7 +103,7 @@ local updateLevel = function(self, unit, name)
 
 	local color = GetDifficultyColor(lvl)
 
-	if lvl <= 0 then	lvl = "??" end
+	if lvl <= 0 then lvl = "??" end
 
 	if typ=="worldboss" then
 	    self.Level:SetText("|cffff0000"..lvl.."b|r")
@@ -167,7 +167,7 @@ local updateHealth = function(self, event, unit, bar, min, max)
 		bar.value:SetText("dead")
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText("offline")
-    elseif(unit == "player") then
+    elseif(unit == "player" or unit=="target") then
 		if(min ~= max) then
 			bar.value:SetText("|cff33EE44"..numberize(min) .."|r.".. floor(min/max*100).."%")
 		else
@@ -175,26 +175,17 @@ local updateHealth = function(self, event, unit, bar, min, max)
 		end
 	elseif(unit == "targettarget") then
 		bar.value:SetText(floor(min/max*100).."%")
-    elseif(unit == "target") then
+	elseif(unit == "pet") then
 		if(min ~= max) then
-			bar.value:SetText("|cff33EE44"..numberize(min).."|r."..floor(min/max*100).."%")
+			bar.value:SetText(floor(min/max*100).."%")
 		else
 			bar.value:SetText(" ")
 		end
-
 	elseif(min == max) then
-        if unit == "pet" then
-			bar.value:SetText(" ") -- just here if otherwise wanted
-		else
-			bar.value:SetText(" ")
-		end
+		bar.value:SetText(" ")
     else
         if((max-min) < max) then
-			if unit == "pet" then
-				bar.value:SetText("-"..max-min) -- negative values as for party, just here if otherwise wanted
-			else
-				bar.value:SetText("-"..max-min) -- this makes negative values (easier as a healer)
-			end
+			bar.value:SetText("-"..max-min) -- this makes negative values (easier as a healer)
 	    end
     end
 
@@ -206,40 +197,30 @@ end
 -- power update
 -- ------------------------------------------------------------------------
 local updatePower = function(self, event, unit, bar, min, max)
-	if UnitIsPlayer(unit)==nil then
+	local _, ptype = UnitPowerType(unit)
+	local color = oUF.colors.power[ptype]
+	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
+		bar:SetValue(0)
+	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText()
-	else
-		local _, ptype = UnitPowerType(unit)
-		local color = oUF.colors.power[ptype]
-		if(min==0) then
-			bar.value:SetText()
-		elseif(UnitIsDead(unit) or UnitIsGhost(unit)) then
-			bar:SetValue(0)
-		elseif(not UnitIsConnected(unit)) then
-			bar.value:SetText()
-		elseif unit=="player" then
-			if(min==max) then
-				bar.value:SetText("")
-	        else
-				local d = floor(min/max*100)
-            	bar.value:SetText(hexColor(color)..numberize(min).."|r.".. d.."%")
-			end
+	elseif unit=="player" then
+		if(min==max) then
+			bar.value:SetText("")
         else
-			if((max-min) > 0) then
-				bar.value:SetText(min)
-				if color then
-					bar.value:SetTextColor(color[1], color[2], color[3])
-				else
-					bar.value:SetTextColor(0.2, 0.66, 0.93)
-				end
-			else
-				bar.value:SetText(min)
-				if color then
-					bar.value:SetTextColor(color[1], color[2], color[3])
-				else
-					bar.value:SetTextColor(0.2, 0.66, 0.93)
-				end
-			end
+           	bar.value:SetText(hexColor(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+		end
+	elseif unit=="pet" then
+		if(min==max) then
+			bar.value:SetText("")
+        else
+       		bar.value:SetText(hexColor(color)..numberize(min).."|r")
+		end
+	else
+		bar.value:SetText(min)
+		if color then
+			bar.value:SetTextColor(unpack(color))
+		else
+			bar.value:SetTextColor(0.2, 0.66, 0.93)
 		end
 	end
 end
@@ -471,11 +452,14 @@ local func = function(self, unit)
 	if unit=="pet" then
 		self:SetWidth(120)
 		self:SetHeight(18)
-		self.Health:SetHeight(18)
-		self.Power:Hide()
-		self.Health.value:Hide()
-		self.Level:Hide()
+		self.Health:SetHeight(15.5)
 		self.Name:Hide()
+		self.Health.value:SetPoint("RIGHT", 0, 9)
+	    self.Power:SetHeight(3)
+        self.Power.value:Show()
+		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
+		self.Power.value:SetJustifyH"LEFT"
+		self.Level:Hide()
 
 		if playerClass=="HUNTER" then
 			self.Health.colorReaction = false
