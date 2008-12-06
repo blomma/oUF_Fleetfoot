@@ -399,16 +399,6 @@ local func = function(self, unit)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 
 		--
-		-- oUF_PowerSpark support
-		--
-        self.Spark = self.Power:CreateTexture(nil, "OVERLAY")
-		self.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
-		self.Spark:SetVertexColor(1, 1, 1, 1)
-		self.Spark:SetBlendMode("ADD")
-		self.Spark:SetHeight(self.Power:GetHeight()*2.5)
-		self.Spark:SetWidth(self.Power:GetHeight()*2)
-
-		--
 		-- oUF_BarFader
 		--
 		if(IsAddOnLoaded('oUF_BarFader')) then
@@ -440,6 +430,27 @@ local func = function(self, unit)
 			self.Health.colorClass = false
 			self.Health.colorHappiness = true
 		end
+
+		--
+		-- Aura sorting
+		--
+		if(IsAddOnLoaded('oUF_AuraSort')) then
+			self.sortAuras = {}
+		end
+		
+		--
+		-- buffs
+		--
+		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
+		self.Buffs.size = 30
+		self.Buffs:SetHeight(self.Buffs.size)
+		self.Buffs:SetWidth(self.Buffs.size * 5)
+		self.Buffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -2, 0)
+		self.Buffs.initialAnchor = "TOPLEFT"
+		self.Buffs["growth-y"] = "DOWN"
+		self.Buffs.filter = false
+		self.Buffs.num = 20
+		self.Buffs.spacing = 2
 
 		--
 		-- oUF_BarFader
@@ -629,11 +640,8 @@ local func = function(self, unit)
 			self.AutoShot:SetBackdrop({
 				bgFile = "Interface\ChatFrame\ChatFrameBackground",
 				insets = {top = -3, left = -3, bottom = -3, right = -3}})
-
-			--self.AutoShot:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, left = -1, bottom = -1, right = -1}})
 			self.AutoShot:SetBackdropColor(0, 0, 0)
 
-			--self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightSmall')
 			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
 			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
 		    self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
