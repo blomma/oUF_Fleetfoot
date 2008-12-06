@@ -248,8 +248,6 @@ end
 -- the layout starts here
 -- ------------------------------------------------------------------------
 local func = function(self, unit)
-	self.sortAuras = {} -- Enable Aura Sorting
-
 	self.menu = menu -- Enable the menus
 
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -485,6 +483,13 @@ local func = function(self, unit)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 
 		--
+		-- Aura sorting
+		--
+		if(IsAddOnLoaded('oUF_AuraSort')) then
+			self.sortAuras = {}
+		end
+		
+		--
 		-- buffs
 		--
 		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
@@ -615,36 +620,13 @@ local func = function(self, unit)
 		self.Power.value:Hide()
 		self.Health.value:SetPoint("RIGHT", 0 , 9)
 		self.Name:SetPoint("LEFT", 0, 9)
-
-		--
-		-- debuffs
-		--
-		self.Debuffs = CreateFrame("Frame", nil, self)
-		self.Debuffs.size = 20 * 1.3
-		self.Debuffs:SetHeight(self.Debuffs.size)
-		self.Debuffs:SetWidth(self.Debuffs.size * 5)
-		self.Debuffs:SetPoint("LEFT", self, "RIGHT", 5, 0)
-		self.Debuffs.initialAnchor = "TOPLEFT"
-	    self.Debuffs.filter = false
-		self.Debuffs.showDebuffType = true
-		self.Debuffs.spacing = 2
-		self.Debuffs.num = 2 -- max debuffs
-
-		--
-		-- raid target icons
-		--
-		self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY")
-		self.RaidIcon:SetHeight(24)
-		self.RaidIcon:SetWidth(24)
-		self.RaidIcon:SetPoint("LEFT", self, -30, 0)
-		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 	end
 
 	-- ------------------------------------
 	-- raid
 	-- ------------------------------------
     if(self:GetParent():GetName():match"oUF_Raid") then
-		self:SetWidth(85)
+		self:SetWidth(50)
 		self:SetHeight(15)
 		self.Health:SetHeight(15)
 		self.Power:Hide()
@@ -652,20 +634,9 @@ local func = function(self, unit)
 		self.Power:SetFrameLevel(2)
 		self.Health.value:Hide()
 		self.Power.value:Hide()
-		self.Name:SetFont(font, 12, "OUTLINE")
-		self.Name:SetWidth(85)
+		self.Name:SetFont(font, 9, "OUTLINE")
+		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
-
-		--
-		-- oUF_DebuffHighlight support
-		--
-		self.DebuffHighlight = self.Health:CreateTexture(nil, "OVERLAY")
-		self.DebuffHighlight:SetAllPoints(self.Health)
-		self.DebuffHighlight:SetTexture("Interface\\AddOns\\oUF_Blomma\\textures\\highlight.tga")
-		self.DebuffHighlight:SetBlendMode("ADD")
-		self.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
-		self.DebuffHighlightAlpha = 0.8
-		self.DebuffHighlightFilter = true
     end
 
 	--
@@ -704,25 +675,19 @@ end
 oUF:RegisterStyle("Blomma", func)
 
 oUF:SetActiveStyle("Blomma")
-local player = oUF:Spawn("player", "oUF_Player")
-player:SetPoint("CENTER", -280, -106)
-local target = oUF:Spawn("target", "oUF_Target")
-target:SetPoint("CENTER", 280, -106)
-local pet = oUF:Spawn("pet", "oUF_Pet")
-pet:SetPoint("BOTTOMLEFT", player, 0, -30)
-local tot = oUF:Spawn("targettarget", "oUF_TargetTarget")
-tot:SetPoint("TOPRIGHT", target, 0, 35)
-local focus	= oUF:Spawn("focus", "oUF_Focus")
-focus:SetPoint("BOTTOMRIGHT", player, 0, -30)
+oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -106)
+oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -106)
+oUF:Spawn("pet", "oUF_Pet"):SetPoint("BOTTOMLEFT", oUF.units.player, 0, -30)
+oUF:Spawn("targettarget", "oUF_TargetTarget"):SetPoint("TOPRIGHT", oUF.units.target, 0, 35)
+oUF:Spawn("focus", "oUF_Focus"):SetPoint("BOTTOMRIGHT", oUF.units.player, 0, -30)
 
 --
 -- party
 --
 local party	= oUF:Spawn("header", "oUF_Party")
-party:SetManyAttributes("showParty", true, "yOffset", -15)
-party:SetPoint("TOPLEFT", 35, -200)
+party:SetManyAttributes("showParty", true, "yOffset", -15, "showPlayer", false)
+party:SetPoint("TOPLEFT", 20, -20)
 party:Show()
-party:SetAttribute("showRaid", false)
 
 --
 -- raid
@@ -734,10 +699,12 @@ for i = 1, NUM_RAID_GROUPS do
 	RaidGroup:SetAttribute("showRaid", true)
 	RaidGroup:SetAttribute("yOffset", -10)
 	RaidGroup:SetAttribute("point", "TOP")
+	RaidGroup:SetAttribute("sortDir", "ASC")
 	RaidGroup:SetAttribute("showRaid", true)
+	RaidGroup:SetAttribute("showParty", false)
 	table.insert(Raid, RaidGroup)
 	if i == 1 then
-		RaidGroup:SetPoint("TOPLEFT", UIParent, 35, -35)
+		RaidGroup:SetPoint("TOPLEFT", UIParent, 20, -20)
 	else
 		RaidGroup:SetPoint("TOPLEFT", Raid[i-1], "TOPRIGHT", 10, 0)
 	end
@@ -757,7 +724,7 @@ partyToggle:SetScript('OnEvent', function(self)
 		self:RegisterEvent('PLAYER_REGEN_ENABLED')
 	else
 		self:UnregisterEvent('PLAYER_REGEN_DISABLED')
-		if(HIDE_PARTY_INTERFACE == "1" and GetNumRaidMembers() > 0) then
+		if(UnitInRaid("player")) then
 			party:Hide()
 		else
 			party:Show()
