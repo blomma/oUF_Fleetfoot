@@ -367,6 +367,10 @@ local func = function(self, unit)
 	-- player
 	-- ------------------------------------
     if unit=="player" then
+		-- Make heath and mana fastupdate
+		self.Power.frequentUpdates = true
+		self.Health.frequentUpdates = true
+
         self:SetWidth(250)
       	self:SetHeight(20)
 		self.Health:SetHeight(15.5)
@@ -417,6 +421,10 @@ local func = function(self, unit)
 	-- pet
 	-- ------------------------------------
 	if unit=="pet" then
+		-- Make heath and mana fastupdate
+		self.Power.frequentUpdates = true
+		self.Health.frequentUpdates = true
+
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(15.5)
