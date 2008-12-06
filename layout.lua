@@ -41,7 +41,7 @@ local playerClass = select(2, UnitClass("player"))
 
 -- castbar position
 local playerCastBar_x = 0
-local playerCastBar_y = -200
+local playerCastBar_y = -230
 
 -- ------------------------------------------------------------------------
 -- change some colors :)
