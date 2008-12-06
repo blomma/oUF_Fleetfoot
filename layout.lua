@@ -83,7 +83,7 @@ end
 -- ------------------------------------------------------------------------
 -- returns the hex code of a rgb value
 -- ------------------------------------------------------------------------
-local hexColor = function(r, g, b)
+local hex = function(r, g, b)
 	if type(r) == "table" then
 		if r.r then
 			r, g, b = r.r, r.g, r.b
@@ -207,13 +207,13 @@ local updatePower = function(self, event, unit, bar, min, max)
 		if(min==max) then
 			bar.value:SetText("")
         else
-           	bar.value:SetText(hexColor(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+           	bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
 		end
 	elseif unit=="pet" then
 		if(min==max) then
 			bar.value:SetText("")
         else
-       		bar.value:SetText(hexColor(color)..numberize(min).."|r")
+       		bar.value:SetText(hex(color)..numberize(min).."|r")
 		end
 	else
 		bar.value:SetText(min)
