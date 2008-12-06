@@ -262,8 +262,8 @@ local func = function(self, unit)
 	-- background
 	--
 	self:SetBackdrop{
-	bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16,
-	insets = {left = -2, right = -2, top = -2, bottom = -2},
+		bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16,
+		insets = {left = -2, right = -2, top = -2, bottom = -2},
 	}
 	self:SetBackdropColor(0,0,0,1) -- and color the backgrounds
 
@@ -378,35 +378,6 @@ local func = function(self, unit)
 		self.Power.value:SetJustifyH"LEFT"
 		self.Level:Hide()
 
-		--[[
-		if(playerClass=="DRUID") then
-			-- bar
-			self.DruidMana = CreateFrame('StatusBar', nil, self)
-			self.DruidMana:SetPoint('TOP', self, 'BOTTOM', 0, -6)
-			self.DruidMana:SetStatusBarTexture(bartex)
-			self.DruidMana:SetStatusBarColor(45/255, 113/255, 191/255)
-			self.DruidMana:SetHeight(10)
-			self.DruidMana:SetWidth(250)
-			-- bar bg
-			self.DruidMana.bg = self.DruidMana:CreateTexture(nil, "BORDER")
-			self.DruidMana.bg:SetAllPoints(self.DruidMana)
-			self.DruidMana.bg:SetTexture(bartex)
-			self.DruidMana.bg:SetAlpha(0.30)
-			-- black bg
-			self.DruidMana:SetBackdrop{
-				bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16,
-				insets = {left = -2, right = -2.5, top = -2.5, bottom = -2},
-				}
-			self.DruidMana:SetBackdropColor(0,0,0,1)
-			-- text
-			self.DruidManaText = self.DruidMana:CreateFontString(nil, 'OVERLAY')
-			self.DruidManaText:SetPoint("CENTER", self.DruidMana, "CENTER", 0, 1)
-			self.DruidManaText:SetFont(font, 12, "OUTLINE")
-			self.DruidManaText:SetTextColor(1,1,1)
-			self.DruidManaText:SetShadowOffset(1, -1)
-		end
-		--]]
-
 		--
 		-- leader icon
 		--
@@ -434,10 +405,6 @@ local func = function(self, unit)
 		self.Spark:SetBlendMode("ADD")
 		self.Spark:SetHeight(self.Power:GetHeight()*2.5)
 		self.Spark:SetWidth(self.Power:GetHeight()*2)
-        -- self.Spark.rtl = true -- Make the spark go from Right To Left instead
-		-- self.Spark.manatick = true -- Show mana regen ticks outside FSR (like the energy ticker)
-		-- self.Spark.highAlpha = 1 	-- What alpha setting to use for the FSR and energy spark
-		-- self.Spark.lowAlpha = 0.25 -- What alpha setting to use for the mana regen ticker
 
 		--
 		-- oUF_BarFader
