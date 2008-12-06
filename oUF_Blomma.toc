@@ -1,8 +1,8 @@
 ## Interface: 30000
-## Author: Lyn
-## Title: oUF_Lyn
-## Version: 1.2.4f
-## OptionalDeps: oUF_PowerSpark, oUF_DebuffHighlight, oUF_Banzai, oUF_BarFader
+## Author: Blomma
+## Title: oUF_Blomma
+## Version: 1
+## OptionalDeps: oUF_PowerSpark, oUF_DebuffHighlight, oUF_Banzai, oUF_BarFader oUF_AuraSort
 ## RequiredDeps: oUF
 
 layout.lua

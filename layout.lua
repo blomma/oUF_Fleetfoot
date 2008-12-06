@@ -1,12 +1,13 @@
 ﻿--[[
 
-	oUF_Lyn
+	oUF_Blomma
 
-	Author:		Lyn
-	Mail:		post@endlessly.de
-	URL:		http://www.wowinterface.com/list.php?skinnerid=62149
+	Author:		Blomma
+	Mail:		blomma@gmail.com
 
-	Credits:	oUF_TsoHG (used as base) / http://www.wowinterface.com/downloads/info8739-oUF_TsoHG.html
+	Credits:	
+				oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
+				oUF_TsoHG (used as base) / http://www.wowinterface.com/downloads/info8739-oUF_TsoHG.html
 				Rothar for buff border (and Neal for the edited version)
 				p3lim for party toggle function
 
@@ -31,11 +32,11 @@ local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
 -- ------------------------------------------------------------------------
-local font = "Interface\\AddOns\\oUF_Lyn\\fonts\\font.ttf"
-local upperfont = "Interface\\AddOns\\oUF_Lyn\\fonts\\upperfont.ttf"
+local font = "Interface\\AddOns\\oUF_Blomma\\fonts\\font.ttf"
+local upperfont = "Interface\\AddOns\\oUF_Blomma\\fonts\\upperfont.ttf"
 local fontsize = 15
-local bartex = "Interface\\AddOns\\oUF_Lyn\\textures\\statusbar"
-local bufftex = "Interface\\AddOns\\oUF_Lyn\\textures\\border"
+local bartex = "Interface\\AddOns\\oUF_Blomma\\textures\\statusbar"
+local bufftex = "Interface\\AddOns\\oUF_Blomma\\textures\\border"
 local playerClass = select(2, UnitClass("player"))
 
 -- castbar position
@@ -708,7 +709,7 @@ local func = function(self, unit)
 		--
 		self.DebuffHighlight = self.Health:CreateTexture(nil, "OVERLAY")
 		self.DebuffHighlight:SetAllPoints(self.Health)
-		self.DebuffHighlight:SetTexture("Interface\\AddOns\\oUF_Lyn\\textures\\highlight.tga")
+		self.DebuffHighlight:SetTexture("Interface\\AddOns\\oUF_Blomma\\textures\\highlight.tga")
 		self.DebuffHighlight:SetBlendMode("ADD")
 		self.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
 		self.DebuffHighlightAlpha = 0.8
