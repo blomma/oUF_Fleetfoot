@@ -411,7 +411,9 @@ local func = function(self, unit)
 		--
 		-- oUF_BarFader
 		--
-		self.BarFade = true
+		if(IsAddOnLoaded('oUF_BarFader')) then
+			self.BarFade = true
+		end
 	end
 
 	-- ------------------------------------
@@ -442,7 +444,9 @@ local func = function(self, unit)
 		--
 		-- oUF_BarFader
 		--
-		self.BarFade = true
+		if(IsAddOnLoaded('oUF_BarFader')) then
+			self.BarFade = true
+		end
 	end
 
 	-- ------------------------------------
@@ -543,8 +547,10 @@ local func = function(self, unit)
 		--
 		-- oUF_BarFader
 		--
-		if unit=="focus" then
-			self.BarFade = true
+		if(IsAddOnLoaded('oUF_BarFader')) then
+			if unit=="focus" then
+				self.BarFade = true
+			end
 		end
 	end
 
@@ -607,6 +613,37 @@ local func = function(self, unit)
 	    self.Castbar.Time:SetFont(upperfont, 12, "OUTLINE")
 	    self.Castbar.Time:SetTextColor(1, 1, 1)
 	    self.Castbar.Time:SetJustifyH('RIGHT')
+	end
+
+	-- ------------------------------------
+	-- autoshot bar
+	-- ------------------------------------
+	if(unit == 'player') then
+		if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER') then
+			self.AutoShot = CreateFrame('StatusBar', nil, self)
+			self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
+			self.AutoShot:SetStatusBarTexture(bartex)
+			self.AutoShot:SetStatusBarColor(1, 0.7, 0)
+			self.AutoShot:SetHeight(6)
+			self.AutoShot:SetWidth(250)
+			self.AutoShot:SetBackdrop({
+				bgFile = "Interface\ChatFrame\ChatFrameBackground",
+				insets = {top = -3, left = -3, bottom = -3, right = -3}})
+
+			--self.AutoShot:SetBackdrop({bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], insets = {top = -1, left = -1, bottom = -1, right = -1}})
+			self.AutoShot:SetBackdropColor(0, 0, 0)
+
+			--self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightSmall')
+			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
+			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
+		    self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
+			self.AutoShot.Time:SetShadowOffset(1, -1)
+		    self.AutoShot.Time:SetTextColor(1, 1, 1)
+
+			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
+			self.AutoShot.bg:SetAllPoints(self.AutoShot)
+			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)				
+		end
 	end
 
 	-- ------------------------------------
