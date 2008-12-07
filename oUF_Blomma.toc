@@ -2,7 +2,7 @@
 ## Author: Blomma
 ## Title: oUF_Blomma
 ## Version: 1
-## OptionalDeps: oUF_PowerSpark, oUF_DebuffHighlight, oUF_Banzai, oUF_BarFader oUF_AuraSort
+## OptionalDeps: oUF_BarFader oUF_AuraSort oUF_Runed
 ## RequiredDeps: oUF
 
 layout.lua

@@ -5,7 +5,7 @@
 	Author:		Blomma
 	Mail:		blomma@gmail.com
 
-	Credits:	
+	Credits:
 				oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
 				oUF_TsoHG (used as base) / http://www.wowinterface.com/downloads/info8739-oUF_TsoHG.html
 				Rothar for buff border (and Neal for the edited version)
@@ -37,6 +37,7 @@ local upperfont = "Interface\\AddOns\\oUF_Blomma\\fonts\\upperfont.ttf"
 local fontsize = 15
 local bartex = "Interface\\AddOns\\oUF_Blomma\\textures\\statusbar"
 local bufftex = "Interface\\AddOns\\oUF_Blomma\\textures\\border"
+local runetex = "Interface\\AddOns\\oUF_Blomma\\textures\\runebar"
 local playerClass = select(2, UnitClass("player"))
 
 -- castbar position
@@ -244,6 +245,13 @@ local auraIcon = function(self, button, icons)
 	button.cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
 end
 
+local PostCreateRunes = function(self)
+	for i=1,6 do
+		self.runes[i]:SetStatusBarTexture(runetex)
+	end
+end
+
+
 -- ------------------------------------------------------------------------
 -- the layout starts here
 -- ------------------------------------------------------------------------
@@ -432,13 +440,6 @@ local func = function(self, unit)
 		end
 
 		--
-		-- Aura sorting
-		--
-		if(IsAddOnLoaded('oUF_AuraSort')) then
-			--self.sortAuras = {}
-		end
-		
-		--
 		-- buffs
 		--
 		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
@@ -451,6 +452,16 @@ local func = function(self, unit)
 		self.Buffs.filter = false
 		self.Buffs.num = 20
 		self.Buffs.spacing = 2
+
+		--
+		-- combo points
+		--
+		self.CPoints = self:CreateFontString(nil, "OVERLAY")
+		self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
+		self.CPoints:SetFont(font, 38, "OUTLINE")
+		self.CPoints:SetTextColor(0, 0.81, 1)
+		self.CPoints:SetShadowOffset(1, -1)
+		self.CPoints:SetJustifyH"RIGHT"
 
 		--
 		-- oUF_BarFader
@@ -503,7 +514,7 @@ local func = function(self, unit)
 		if(IsAddOnLoaded('oUF_AuraSort')) then
 			self.sortAuras = {}
 		end
-		
+
 		--
 		-- buffs
 		--
@@ -650,7 +661,20 @@ local func = function(self, unit)
 
 			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
 			self.AutoShot.bg:SetAllPoints(self.AutoShot)
-			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)				
+			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
+		end
+	end
+
+	-- ------------------------------------
+	-- rune bar
+	-- ------------------------------------
+	if(unit == 'player') then
+		if(playerClass == 'DEATHKNIGHT') then
+  			self.Runes = CreateFrame("Frame", nil, self)
+			self.Runes:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
+        	self.Runes:SetWidth(50)
+        	self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
+        	self.Runes.PostCreateRunes = PostCreateRunes
 		end
 	end
 
