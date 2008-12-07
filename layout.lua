@@ -435,17 +435,17 @@ local func = function(self, unit)
 		-- Aura sorting
 		--
 		if(IsAddOnLoaded('oUF_AuraSort')) then
-			self.sortAuras = {}
+			--self.sortAuras = {}
 		end
 		
 		--
 		-- buffs
 		--
 		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
-		self.Buffs.size = 30
+		self.Buffs.size = 29
 		self.Buffs:SetHeight(self.Buffs.size)
-		self.Buffs:SetWidth(self.Buffs.size * 5)
-		self.Buffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -2, 0)
+		self.Buffs:SetWidth(self.Buffs.size * 4)
+		self.Buffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -2, -5)
 		self.Buffs.initialAnchor = "TOPLEFT"
 		self.Buffs["growth-y"] = "DOWN"
 		self.Buffs.filter = false
