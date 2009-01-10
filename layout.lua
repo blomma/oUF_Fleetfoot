@@ -569,10 +569,8 @@ local func = function(self, unit)
 		--
 		-- oUF_BarFader
 		--
-		if(IsAddOnLoaded('oUF_BarFader')) then
-			if unit=="focus" then
-				self.BarFade = true
-			end
+		if(IsAddOnLoaded('oUF_BarFader') and unit=="focus") then
+			self.BarFade = true
 		end
 	end
 
