@@ -199,8 +199,44 @@ local function sortIcons(a, b)
     return expirationTimeA > expirationTimeB
 end
 
-local PreSetAuraPosition = function(self, icons, x)
-	sort(icons, sortIcons)
+local SetAuraPosition = function(self, icons, x)
+	if(icons and x > 0) then
+		
+		sort(icons, sortIcons)
+		
+		local col = 0
+		local row = 0
+		local spacing = icons.spacing or 0
+		local gap = icons.gap
+		local size = (icons.size or 16) + spacing
+		local anchor = icons.initialAnchor or "BOTTOMLEFT"
+		local growthx = (icons["growth-x"] == "LEFT" and -1) or 1
+		local growthy = (icons["growth-y"] == "DOWN" and -1) or 1
+		local cols = math.floor(icons:GetWidth() / size + .5)
+		local rows = math.floor(icons:GetHeight() / size + .5)
+
+		for i = 1, x do
+			local button = icons[i]
+			if(button and button:IsShown()) then
+				if(gap and button.debuff) then
+					if(col > 0) then
+						col = col + 1
+					end
+
+					gap = false
+				end
+
+				if(col >= cols) then
+					col = 0
+					row = row + 1
+				end
+				button:ClearAllPoints()
+				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
+
+				col = col + 1
+			end
+		end
+	end
 end
 
 -- ------------------------------------------------------------------------
@@ -487,7 +523,7 @@ local func = function(self, unit)
 		--
 		-- Aura sorting
 		--
-		self.PreSetAuraPosition = PreSetAuraPosition
+		self.SetAuraPosition = SetAuraPosition
 
 		--
 		-- buffs
