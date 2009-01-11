@@ -58,12 +58,13 @@ end
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
-local numberize = function(value)
-	if value <= 9999 then return value end
-	if value >= 1000000 then
-		return ("%.1fm"):format(value/1000000)
+local truncate = function(value)
+	if(value >= 1e6) then
+		return string.format('%dm', value / 1e6)
+	elseif(value >= 1e4) then
+		return string.format('%dk', value / 1e3)
 	else
-		return ("%.1fk"):format(value/1000)
+		return value
 	end
 end
 
@@ -102,7 +103,7 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 		bar.value:SetText("Offline")
     elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
-			bar.value:SetText("|cff33EE44"..numberize(min) .."|r.".. floor(min/max*100).."%")
+			bar.value:SetText("|cff33EE44"..truncate(min) .."|r.".. floor(min/max*100).."%")
 		else
 			bar.value:SetText()
 		end
@@ -128,16 +129,16 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 			bar.value:SetText()
 		else
 			if(playerClass == "DEATHKNIGHT") then
-				bar.value:SetText(hex(color)..numberize(min).."|r")
+				bar.value:SetText(hex(color)..truncate(min).."|r")
 			else
-				bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+				bar.value:SetText(hex(color)..truncate(min).."|r.".. floor(min/max*100).."%")
 			end
 		end
 	elseif(unit=="pet") then
 		if(min==max) then
 			bar.value:SetText()
 		else
-			bar.value:SetText(hex(color)..numberize(min).."|r")
+			bar.value:SetText(hex(color)..truncate(min).."|r")
 		end
 	end
 end
