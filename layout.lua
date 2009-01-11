@@ -158,6 +158,15 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 end
 
 -- ------------------------------------------------------------------------
+-- runes
+-- ------------------------------------------------------------------------
+local PostCreateRunes = function(self)
+	for i=1,6 do
+		self.runes[i]:SetStatusBarTexture(runetex)
+	end
+end
+
+-- ------------------------------------------------------------------------
 -- aura reskin
 -- ------------------------------------------------------------------------
 local PostCreateAuraIcon = function(self, button, icons)
@@ -174,12 +183,6 @@ local PostCreateAuraIcon = function(self, button, icons)
 	button.cd:SetReverse()
 	button.cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
 	button.cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-end
-
-local PostCreateRunes = function(self)
-	for i=1,6 do
-		self.runes[i]:SetStatusBarTexture(runetex)
-	end
 end
 
 -- ------------------------------------------------------------------------
@@ -204,7 +207,7 @@ end
 -- the layout starts here
 -- ------------------------------------------------------------------------
 local func = function(self, unit)
-	self.menu = menu -- Enable the menus
+	self.menu = menu
 
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
@@ -219,13 +222,13 @@ local func = function(self, unit)
 		bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16,
 		insets = {left = -2, right = -2, top = -2, bottom = -2},
 	}
-	self:SetBackdropColor(0,0,0,1) -- and color the backgrounds
+	self:SetBackdropColor(0,0,0,1)
 
 	--
 	-- healthbar
 	--
 	self.Health = CreateFrame"StatusBar"
-	self.Health:SetHeight(19) -- Custom height
+	self.Health:SetHeight(19)
 	self.Health:SetStatusBarTexture(bartex)
     self.Health:SetParent(self)
 	self.Health:SetPoint"TOP"
@@ -280,7 +283,7 @@ local func = function(self, unit)
 	-- powerbar text
 	--
 	self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
-    self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5) -- powerbar text in health box
+    self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5)
 	self.Power.value:SetFont(font, fontsize, "OUTLINE")
 	self.Power.value:SetTextColor(1,1,1)
 	self.Power.value:SetShadowOffset(1, -1)
@@ -348,6 +351,43 @@ local func = function(self, unit)
 		self.RaidIcon:SetWidth(16)
 		self.RaidIcon:SetPoint("TOP", self, 0, 9)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
+
+		-- ------------------------------------
+		-- autoshot bar
+		-- ------------------------------------
+		if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER') then
+			self.AutoShot = CreateFrame('StatusBar', nil, self)
+			self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
+			self.AutoShot:SetStatusBarTexture(bartex)
+			self.AutoShot:SetStatusBarColor(1, 0.7, 0)
+			self.AutoShot:SetHeight(6)
+			self.AutoShot:SetWidth(250)
+			self.AutoShot:SetBackdrop({
+				bgFile = "Interface\ChatFrame\ChatFrameBackground",
+				insets = {top = -3, left = -3, bottom = -3, right = -3}})
+			self.AutoShot:SetBackdropColor(0, 0, 0)
+
+			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
+			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
+		    self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
+			self.AutoShot.Time:SetShadowOffset(1, -1)
+		    self.AutoShot.Time:SetTextColor(1, 1, 1)
+
+			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
+			self.AutoShot.bg:SetAllPoints(self.AutoShot)
+			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
+		end
+
+		-- ------------------------------------
+		-- rune bar
+		-- ------------------------------------
+		if(playerClass == 'DEATHKNIGHT') then
+  			self.Runes = CreateFrame("Frame", nil, self)
+			self.Runes:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
+        	self.Runes:SetWidth(50)
+        	self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
+        	self.Runes.PostCreateRunes = PostCreateRunes
+		end
 	end
 
 	-- ------------------------------------
@@ -376,7 +416,7 @@ local func = function(self, unit)
 		--
 		-- buffs
 		--
-		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
+		self.Buffs = CreateFrame("Frame", nil, self)
 		self.Buffs.size = 29
 		self.Buffs:SetHeight(self.Buffs.size)
 		self.Buffs:SetWidth(self.Buffs.size * 4)
@@ -452,7 +492,7 @@ local func = function(self, unit)
 		--
 		-- buffs
 		--
-		self.Buffs = CreateFrame("Frame", nil, self) -- buffs
+		self.Buffs = CreateFrame("Frame", nil, self)
 		self.Buffs.size = 22
 		self.Buffs:SetHeight(self.Buffs.size)
 		self.Buffs:SetWidth(self.Buffs.size * 5)
@@ -491,6 +531,7 @@ local func = function(self, unit)
 		self.Name:SetWidth(95)
 		self.Name:SetHeight(18)
 		self.Name:SetTextColor(0.9, 0.5, 0.2)
+
 		--
 		-- raid target icons
 		--
@@ -557,47 +598,6 @@ local func = function(self, unit)
 	end
 
 	-- ------------------------------------
-	-- autoshot bar
-	-- ------------------------------------
-	if(unit == 'player') then
-		if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER') then
-			self.AutoShot = CreateFrame('StatusBar', nil, self)
-			self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
-			self.AutoShot:SetStatusBarTexture(bartex)
-			self.AutoShot:SetStatusBarColor(1, 0.7, 0)
-			self.AutoShot:SetHeight(6)
-			self.AutoShot:SetWidth(250)
-			self.AutoShot:SetBackdrop({
-				bgFile = "Interface\ChatFrame\ChatFrameBackground",
-				insets = {top = -3, left = -3, bottom = -3, right = -3}})
-			self.AutoShot:SetBackdropColor(0, 0, 0)
-
-			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
-			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
-		    self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
-			self.AutoShot.Time:SetShadowOffset(1, -1)
-		    self.AutoShot.Time:SetTextColor(1, 1, 1)
-
-			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
-			self.AutoShot.bg:SetAllPoints(self.AutoShot)
-			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
-		end
-	end
-
-	-- ------------------------------------
-	-- rune bar
-	-- ------------------------------------
-	if(unit == 'player') then
-		if(playerClass == 'DEATHKNIGHT') then
-  			self.Runes = CreateFrame("Frame", nil, self)
-			self.Runes:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
-        	self.Runes:SetWidth(50)
-        	self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
-        	self.Runes.PostCreateRunes = PostCreateRunes
-		end
-	end
-
-	-- ------------------------------------
 	-- party
 	-- ------------------------------------
 	if(self:GetParent():GetName():match"oUF_Party") then
@@ -628,19 +628,9 @@ local func = function(self, unit)
     end
 
 	--
-	-- fading for party and raid
-	--
-	if(not unit) then -- fadeout if units are out of range
-		self.Range = false -- put true to make party/raid frames fade out if not in your range
-		self.inRangeAlpha = 1.0 -- what alpha if IN range
-		self.outsideRangeAlpha = 0.5 -- the alpha it will fade out to if not in range
-    end
-
-	--
 	-- custom aura textures
 	--
 	self.PostCreateAuraIcon = PostCreateAuraIcon
-	self.SetAuraPosition = auraOffset
 
 	if(self:GetParent():GetName():match"oUF_Party") then
 		self:SetAttribute('initial-height', 20)
