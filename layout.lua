@@ -37,12 +37,7 @@ local upperfont = "Interface\\AddOns\\oUF_Blomma\\fonts\\upperfont.ttf"
 local fontsize = 15
 local bartex = "Interface\\AddOns\\oUF_Blomma\\textures\\statusbar"
 local bufftex = "Interface\\AddOns\\oUF_Blomma\\textures\\border"
-local runetex = "Interface\\AddOns\\oUF_Blomma\\textures\\runebar"
 local playerClass = select(2, UnitClass("player"))
-
--- castbar position
-local playerCastBar_x = 0
-local playerCastBar_y = -230
 
 -- ------------------------------------------------------------------------
 -- change some colors :)
@@ -96,7 +91,6 @@ end
 -- ------------------------------------------------------------------------
 -- name update
 -- ------------------------------------------------------------------------
-
 oUF.Tags['[name]'] = function(u, r)
 	return UnitName(r or u):lower() or ''
 end
@@ -112,18 +106,17 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 		bar:SetValue(0)
 		bar.value:SetText("Ghost")
 	elseif(not UnitIsConnected(unit)) then
-		bar.value:SetText("offline")
+		bar.value:SetText("Offline")
     elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
 			bar.value:SetText("|cff33EE44"..numberize(min) .."|r.".. floor(min/max*100).."%")
 		else
-			bar.value:SetText("")
+			bar.value:SetText()
 		end
 	else
-		bar.value:SetText("")
+		bar.value:SetText()
 	end
 end
-
 
 -- ------------------------------------------------------------------------
 -- power update
@@ -135,34 +128,24 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 		bar:SetValue(0)
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText()
-	elseif unit=="player" then
-		if(min==max) then
-			bar.value:SetText("")
+	elseif(unit=="player") then
+		if(playerClass == "DEATHKNIGHT" and min == 0) then
+			bar.value:SetText()			
+		elseif(min==max) then
+			bar.value:SetText()
 		else
-			bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+			if(playerClass == "DEATHKNIGHT") then
+				bar.value:SetText(hex(color)..numberize(min).."|r")
+			else
+				bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+			end
 		end
-	elseif unit=="pet" then
+	elseif(unit=="pet") then
 		if(min==max) then
-			bar.value:SetText("")
+			bar.value:SetText()
 		else
 			bar.value:SetText(hex(color)..numberize(min).."|r")
 		end
-	else
-		bar.value:SetText(min)
-		if color then
-			bar.value:SetTextColor(unpack(color))
-		else
-			bar.value:SetTextColor(0.2, 0.66, 0.93)
-		end
-	end
-end
-
--- ------------------------------------------------------------------------
--- runes
--- ------------------------------------------------------------------------
-local PostCreateRunes = function(self)
-	for i=1,6 do
-		self.runes[i]:SetStatusBarTexture(runetex)
 	end
 end
 
@@ -413,17 +396,6 @@ local func = function(self, unit)
 			self.AutoShot.bg:SetAllPoints(self.AutoShot)
 			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
 		end
-
-		-- ------------------------------------
-		-- rune bar
-		-- ------------------------------------
-		if(playerClass == 'DEATHKNIGHT') then
-			self.Runes = CreateFrame("Frame", nil, self)
-			self.Runes:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
-			self.Runes:SetWidth(50)
-			self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
-			self.Runes.PostCreateRunes = PostCreateRunes
-		end
 	end
 
 	-- ------------------------------------
@@ -599,7 +571,7 @@ local func = function(self, unit)
 			self.Castbar.SafeZone:SetVertexColor(.75,.10,.10,.6)
 			self.Castbar.SafeZone:SetPoint("TOPRIGHT")
 			self.Castbar.SafeZone:SetPoint("BOTTOMRIGHT")
-			self.Castbar:SetPoint('CENTER', UIParent, 'CENTER', playerCastBar_x, playerCastBar_y)
+			self.Castbar:SetPoint('CENTER', UIParent, 'CENTER', 0, -230)
 		else
 			self.Castbar:SetStatusBarColor(0.80, 0.01, 0)
 			self.Castbar:SetHeight(20)

@@ -3,6 +3,6 @@
 ## Version: 30000.1.3
 ## Title: oUF Blomma
 ## RequiredDeps: oUF
-## OptionalDeps: oUF_AutoShot oUF_BarFader oUF_Runed
+## OptionalDeps: oUF_AutoShot oUF_BarFader
 
 layout.lua
