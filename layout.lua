@@ -267,10 +267,11 @@ local SetStyle = function(self, unit)
 	--
 	-- healthbar functions
 	--
+	self.Health.colorTapping = true
+	self.Health.colorDisconnected = true
 	self.Health.colorClass = true
 	self.Health.colorReaction = true
-	self.Health.colorDisconnected = true
-	self.Health.colorTapping = true
+	self.Health.frequentUpdates = true
 	self.PostUpdateHealth = PostUpdateHealth
 
 	--
@@ -309,7 +310,7 @@ local SetStyle = function(self, unit)
 	self.Power.colorDisconnected = true
 	self.Power.colorClass = true
 	self.Power.colorPower = true
-	self.Power.colorHappiness = false
+	self.Power.frequentUpdates = true
 	self.PostUpdatePower = PostUpdatePower
 
 	--
@@ -334,9 +335,6 @@ local SetStyle = function(self, unit)
 	-- player
 	-- ------------------------------------
 	if unit=="player" then
-		self.Power.frequentUpdates = true
-		self.Health.frequentUpdates = true
-
 		self:SetWidth(250)
 		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
@@ -396,9 +394,6 @@ local SetStyle = function(self, unit)
 	-- pet
 	-- ------------------------------------
 	if unit=="pet" then
-		self.Power.frequentUpdates = true
-		self.Health.frequentUpdates = true
-
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(15.5)
@@ -617,8 +612,9 @@ local SetStyle = function(self, unit)
 	if(self:GetParent():GetName():match"oUF_Raid") then
 		self:SetWidth(50)
 		self:SetHeight(15)
-		self.Health:SetHeight(15)
-		self.Power:Hide()
+		self.Health:SetHeight(13)
+		self.Power:SetHeight(2)
+		--self.Power:Hide()
 		self.Health:SetFrameLevel(2)
 		self.Power:SetFrameLevel(2)
 		self.Health.value:Hide()
