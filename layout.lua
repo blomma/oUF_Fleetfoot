@@ -138,14 +138,14 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 	elseif unit=="player" then
 		if(min==max) then
 			bar.value:SetText("")
-        else
-           	bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
+		else
+			bar.value:SetText(hex(color)..numberize(min).."|r.".. floor(min/max*100).."%")
 		end
 	elseif unit=="pet" then
 		if(min==max) then
 			bar.value:SetText("")
-        else
-       		bar.value:SetText(hex(color)..numberize(min).."|r")
+		else
+			bar.value:SetText(hex(color)..numberize(min).."|r")
 		end
 	else
 		bar.value:SetText(min)
@@ -190,20 +190,20 @@ end
 -- ------------------------------------------------------------------------
 local function sortIcons(a, b)
 	local unit = a:GetParent():GetParent().unit
-    local _, _, _, _, _, _, expirationTimeA = UnitAura(unit, a:GetID(), a.filter)
-    local _, _, _, _, _, _, expirationTimeB = UnitAura(unit, b:GetID(), b.filter)
-        
-    if(not expirationTimeA) then expirationTimeA = -1 end
-    if(not expirationTimeB) then expirationTimeB = -1 end
+	local _, _, _, _, _, _, expirationTimeA = UnitAura(unit, a:GetID(), a.filter)
+	local _, _, _, _, _, _, expirationTimeB = UnitAura(unit, b:GetID(), b.filter)
 
-    return expirationTimeA > expirationTimeB
+	if(not expirationTimeA) then expirationTimeA = -1 end
+	if(not expirationTimeB) then expirationTimeB = -1 end
+
+	return expirationTimeA > expirationTimeB
 end
 
 local SetAuraPosition = function(self, icons, x)
 	if(icons and x > 0) then
-		
+
 		sort(icons, sortIcons)
-		
+
 		local col = 0
 		local row = 0
 		local spacing = icons.spacing or 0
@@ -266,7 +266,7 @@ local func = function(self, unit)
 	self.Health = CreateFrame"StatusBar"
 	self.Health:SetHeight(19)
 	self.Health:SetStatusBarTexture(bartex)
-    self.Health:SetParent(self)
+	self.Health:SetParent(self)
 	self.Health:SetPoint"TOP"
 	self.Health:SetPoint"LEFT"
 	self.Health:SetPoint"RIGHT"
@@ -319,13 +319,13 @@ local func = function(self, unit)
 	-- powerbar text
 	--
 	self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
-    self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5)
+	self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5)
 	self.Power.value:SetFont(font, fontsize, "OUTLINE")
 	self.Power.value:SetTextColor(1,1,1)
 	self.Power.value:SetShadowOffset(1, -1)
-    self.Power.value:Hide()
+	self.Power.value:Hide()
 
-    --
+	--
 	-- powerbar functions
 	--
 	self.Power.colorTapping = true
@@ -339,8 +339,8 @@ local func = function(self, unit)
 	-- names
 	--
 	self.Name = self.Health:CreateFontString(nil, "OVERLAY")
-    self.Name:SetPoint("LEFT", self, 0, 9)
-    self.Name:SetJustifyH"LEFT"
+	self.Name:SetPoint("LEFT", self, 0, 9)
+	self.Name:SetJustifyH"LEFT"
 	self.Name:SetFont(font, fontsize, "OUTLINE")
 	self.Name:SetShadowOffset(1, -1)
 	self.Name:SetTextColor(1,1,1)
@@ -356,17 +356,17 @@ local func = function(self, unit)
 	-- ------------------------------------
 	-- player
 	-- ------------------------------------
-    if unit=="player" then
+	if unit=="player" then
 		self.Power.frequentUpdates = true
 		self.Health.frequentUpdates = true
 
-        self:SetWidth(250)
-      	self:SetHeight(20)
+		self:SetWidth(250)
+		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
 		self.Name:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-	    self.Power:SetHeight(3)
-        self.Power.value:Show()
+		self.Power:SetHeight(3)
+		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH"LEFT"
 
@@ -405,9 +405,9 @@ local func = function(self, unit)
 
 			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
 			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
-		    self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
+			self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
 			self.AutoShot.Time:SetShadowOffset(1, -1)
-		    self.AutoShot.Time:SetTextColor(1, 1, 1)
+			self.AutoShot.Time:SetTextColor(1, 1, 1)
 
 			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
 			self.AutoShot.bg:SetAllPoints(self.AutoShot)
@@ -418,11 +418,11 @@ local func = function(self, unit)
 		-- rune bar
 		-- ------------------------------------
 		if(playerClass == 'DEATHKNIGHT') then
-  			self.Runes = CreateFrame("Frame", nil, self)
+			self.Runes = CreateFrame("Frame", nil, self)
 			self.Runes:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5)
-        	self.Runes:SetWidth(50)
-        	self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
-        	self.Runes.PostCreateRunes = PostCreateRunes
+			self.Runes:SetWidth(50)
+			self.Runes:SetHeight(self.Health:GetHeight()+self.Power:GetHeight())
+			self.Runes.PostCreateRunes = PostCreateRunes
 		end
 	end
 
@@ -438,8 +438,8 @@ local func = function(self, unit)
 		self.Health:SetHeight(15.5)
 		self.Name:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-	    self.Power:SetHeight(3)
-        self.Power.value:Show()
+		self.Power:SetHeight(3)
+		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH"LEFT"
 
@@ -485,7 +485,7 @@ local func = function(self, unit)
 		self.Level:SetPoint("LEFT", self.Health, 0, 9)
 		self.Level:SetJustifyH("LEFT")
 		self.Level:SetFont(font, fontsize, "OUTLINE")
-	    self.Level:SetTextColor(1,1,1)
+		self.Level:SetTextColor(1,1,1)
 		self.Level:SetShadowOffset(1, -1)
 		self:Tag(self.Level, '[level][shortclassification]')
 
@@ -582,8 +582,8 @@ local func = function(self, unit)
 	-- player and target castbar
 	-- ------------------------------------
 	if(unit == 'player' or unit == 'target') then
-	    self.Castbar = CreateFrame('StatusBar', nil, self)
-	    self.Castbar:SetStatusBarTexture(bartex)
+		self.Castbar = CreateFrame('StatusBar', nil, self)
+		self.Castbar:SetStatusBarTexture(bartex)
 
 		if(unit == "player") then
 			self.Castbar:SetStatusBarColor(1, 0.50, 0)
@@ -599,7 +599,6 @@ local func = function(self, unit)
 			self.Castbar.SafeZone:SetVertexColor(.75,.10,.10,.6)
 			self.Castbar.SafeZone:SetPoint("TOPRIGHT")
 			self.Castbar.SafeZone:SetPoint("BOTTOMRIGHT")
-
 			self.Castbar:SetPoint('CENTER', UIParent, 'CENTER', playerCastBar_x, playerCastBar_y)
 		else
 			self.Castbar:SetStatusBarColor(0.80, 0.01, 0)
@@ -615,22 +614,22 @@ local func = function(self, unit)
 
 		self.Castbar:SetBackdropColor(0, 0, 0, 0.5)
 
-	    self.Castbar.bg = self.Castbar:CreateTexture(nil, 'BORDER')
-	    self.Castbar.bg:SetAllPoints(self.Castbar)
-	    self.Castbar.bg:SetTexture(0, 0, 0, 0.6)
+		self.Castbar.bg = self.Castbar:CreateTexture(nil, 'BORDER')
+		self.Castbar.bg:SetAllPoints(self.Castbar)
+		self.Castbar.bg:SetTexture(0, 0, 0, 0.6)
 
 		self.Castbar.Text = self.Castbar:CreateFontString(nil, 'OVERLAY')
-	    self.Castbar.Text:SetPoint('LEFT', self.Castbar, 2, 0)
-	    self.Castbar.Text:SetFont(upperfont, 11, "OUTLINE")
+		self.Castbar.Text:SetPoint('LEFT', self.Castbar, 2, 0)
+		self.Castbar.Text:SetFont(upperfont, 11, "OUTLINE")
 		self.Castbar.Text:SetShadowOffset(1, -1)
-	    self.Castbar.Text:SetTextColor(1, 1, 1)
-	    self.Castbar.Text:SetJustifyH('LEFT')
+		self.Castbar.Text:SetTextColor(1, 1, 1)
+		self.Castbar.Text:SetJustifyH('LEFT')
 
-	    self.Castbar.Time = self.Castbar:CreateFontString(nil, 'OVERLAY')
-	    self.Castbar.Time:SetPoint('RIGHT', self.Castbar, -2, 0)
-	    self.Castbar.Time:SetFont(upperfont, 12, "OUTLINE")
-	    self.Castbar.Time:SetTextColor(1, 1, 1)
-	    self.Castbar.Time:SetJustifyH('RIGHT')
+		self.Castbar.Time = self.Castbar:CreateFontString(nil, 'OVERLAY')
+		self.Castbar.Time:SetPoint('RIGHT', self.Castbar, -2, 0)
+		self.Castbar.Time:SetFont(upperfont, 12, "OUTLINE")
+		self.Castbar.Time:SetTextColor(1, 1, 1)
+		self.Castbar.Time:SetJustifyH('RIGHT')
 	end
 
 	-- ------------------------------------
@@ -649,7 +648,7 @@ local func = function(self, unit)
 	-- ------------------------------------
 	-- raid
 	-- ------------------------------------
-    if(self:GetParent():GetName():match"oUF_Raid") then
+	if(self:GetParent():GetName():match"oUF_Raid") then
 		self:SetWidth(50)
 		self:SetHeight(15)
 		self.Health:SetHeight(15)
@@ -661,7 +660,7 @@ local func = function(self, unit)
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
-    end
+	end
 
 	--
 	-- custom aura textures
