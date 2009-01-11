@@ -70,14 +70,12 @@ end
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
-local numberize = function(v)
-	if v <= 9999 then return v end
-	if v >= 1000000 then
-		local value = string.format("%.1fm", v/1000000)
-		return value
-	elseif v >= 10000 then
-		local value = string.format("%.1fk", v/1000)
-		return value
+local numberize = function(value)
+	if value <= 9999 then return value end
+	if value >= 1000000 then
+		return ("%.1fm"):format(value/1000000)
+	else
+		return ("%.1fk"):format(value/1000)
 	end
 end
 
@@ -100,21 +98,21 @@ end
 -- ------------------------------------------------------------------------
 local updateLevel = function(self, unit, name)
 	local lvl = UnitLevel(unit)
-	local typ = UnitClassification(unit)
+	local class = UnitClassification(unit)
 
 	local color = GetDifficultyColor(lvl)
 
 	if lvl <= 0 then lvl = "??" end
 
-	if typ=="worldboss" then
+	if class=="worldboss" then
 	    self.Level:SetText("|cffff0000"..lvl.."b|r")
-	elseif typ=="rareelite" then
+	elseif class=="rareelite" then
 	    self.Level:SetText(lvl.."r+")
 		self.Level:SetTextColor(color.r, color.g, color.b)
-	elseif typ=="elite" then
+	elseif class=="elite" then
 	    self.Level:SetText(lvl.."+")
 		self.Level:SetTextColor(color.r, color.g, color.b)
-	elseif typ=="rare" then
+	elseif class=="rare" then
 		self.Level:SetText(lvl.."r")
 		self.Level:SetTextColor(color.r, color.g, color.b)
 	else
@@ -162,33 +160,31 @@ end
 -- ------------------------------------------------------------------------
 -- health update
 -- ------------------------------------------------------------------------
-local updateHealth = function(self, event, unit, bar, min, max)
-	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
+local PostUpdateHealth = function(self, event, unit, bar, min, max)
+	if(UnitIsDead(unit)) then
 		bar:SetValue(0)
-		bar.value:SetText("dead")
+		bar.value:SetText("Dead")
+	elseif(UnitIsGhost(unit)) then
+		bar:SetValue(0)
+		bar.value:SetText("Ghost")
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText("offline")
-    elseif(unit == "player" or unit=="target") then
+    elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
 			bar.value:SetText("|cff33EE44"..numberize(min) .."|r.".. floor(min/max*100).."%")
 		else
-			bar.value:SetText(" ")
+			bar.value:SetText("")
 		end
-	elseif(unit == "targettarget") then
-		bar.value:SetText(floor(min/max*100).."%")
-	elseif(unit == "pet") then
-		if(min ~= max) then
-			bar.value:SetText(floor(min/max*100).."%")
-		else
-			bar.value:SetText(" ")
-		end
-	elseif(min == max) then
-		bar.value:SetText(" ")
-    else
-        if((max-min) < max) then
-			bar.value:SetText("-"..max-min) -- this makes negative values (easier as a healer)
-	    end
-    end
+	else
+		bar.value:SetText("")
+	end
+	-- elseif(min == max) then
+	-- 	bar.value:SetText(" ")
+	--     else
+	--         if((max-min) < max) then
+	-- 		bar.value:SetText("-"..max-min) -- this makes negative values (easier as a healer)
+	--     end
+	--     end
 
     self:UNIT_NAME_UPDATE(event, unit)
 end
@@ -197,7 +193,7 @@ end
 -- ------------------------------------------------------------------------
 -- power update
 -- ------------------------------------------------------------------------
-local updatePower = function(self, event, unit, bar, min, max)
+local PostUpdatePower = function(self, event, unit, bar, min, max)
 	local _, ptype = UnitPowerType(unit)
 	local color = oUF.colors.power[ptype]
 	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
@@ -229,7 +225,7 @@ end
 -- ------------------------------------------------------------------------
 -- aura reskin
 -- ------------------------------------------------------------------------
-local auraIcon = function(self, button, icons)
+local PostCreateAuraIcon = function(self, button, icons)
 	icons.showDebuffType = true -- show debuff border type color
 
 	button.icon:SetTexCoord(.07, .93, .07, .93)
@@ -307,7 +303,7 @@ local func = function(self, unit)
 	self.Health.colorReaction = true
 	self.Health.colorDisconnected = true
 	self.Health.colorTapping = true
-	self.PostUpdateHealth = updateHealth -- let the colors be
+	self.PostUpdateHealth = PostUpdateHealth
 
 	--
 	-- powerbar
@@ -346,7 +342,7 @@ local func = function(self, unit)
 	self.Power.colorClass = true
 	self.Power.colorPower = true
 	self.Power.colorHappiness = false
-	self.PostUpdatePower = updatePower -- let the colors be
+	self.PostUpdatePower = PostUpdatePower
 
 	--
 	-- names
@@ -369,11 +365,17 @@ local func = function(self, unit)
 	self.Level:SetShadowOffset(1, -1)
 	self.UNIT_LEVEL = updateLevel
 
+	--
+	-- oUF_BarFader
+	--
+	if(IsAddOnLoaded('oUF_BarFader')) then
+		self.BarFade = true
+	end
+
 	-- ------------------------------------
 	-- player
 	-- ------------------------------------
     if unit=="player" then
-		-- Make heath and mana fastupdate
 		self.Power.frequentUpdates = true
 		self.Health.frequentUpdates = true
 
@@ -405,20 +407,12 @@ local func = function(self, unit)
 		self.RaidIcon:SetWidth(16)
 		self.RaidIcon:SetPoint("TOP", self, 0, 9)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
-
-		--
-		-- oUF_BarFader
-		--
-		if(IsAddOnLoaded('oUF_BarFader')) then
-			self.BarFade = true
-		end
 	end
 
 	-- ------------------------------------
 	-- pet
 	-- ------------------------------------
 	if unit=="pet" then
-		-- Make heath and mana fastupdate
 		self.Power.frequentUpdates = true
 		self.Health.frequentUpdates = true
 
@@ -462,13 +456,6 @@ local func = function(self, unit)
 		self.CPoints:SetTextColor(0, 0.81, 1)
 		self.CPoints:SetShadowOffset(1, -1)
 		self.CPoints:SetJustifyH"RIGHT"
-
-		--
-		-- oUF_BarFader
-		--
-		if(IsAddOnLoaded('oUF_BarFader')) then
-			self.BarFade = true
-		end
 	end
 
 	-- ------------------------------------
@@ -484,8 +471,6 @@ local func = function(self, unit)
 		self.Name:SetPoint("LEFT", self.Level, "RIGHT", 0, 0)
 		self.Name:SetHeight(20)
 		self.Name:SetWidth(150)
-
-		self.Health.colorClass = false
 
 		--
 		-- combo points
@@ -565,13 +550,6 @@ local func = function(self, unit)
 		self.RaidIcon:SetWidth(16)
 		self.RaidIcon:SetPoint("RIGHT", self, 0, 9)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
-
-		--
-		-- oUF_BarFader
-		--
-		if(IsAddOnLoaded('oUF_BarFader') and unit=="focus") then
-			self.BarFade = true
-		end
 	end
 
 	-- ------------------------------------
@@ -605,12 +583,6 @@ local func = function(self, unit)
 			self.Castbar:SetBackdrop({
 				bgFile = "Interface\ChatFrame\ChatFrameBackground",
 				insets = {top = -3, left = -30, bottom = -3, right = -3}})
-
-			-- self.Castbar.Icon = self.Castbar:CreateTexture(nil, 'OVERLAY')
-			-- self.Castbar.Icon:SetPoint("RIGHT", self.Castbar, "LEFT", -3, 0)
-			-- self.Castbar.Icon:SetHeight(24)
-			-- self.Castbar.Icon:SetWidth(24)
-			-- self.Castbar.Icon:SetTexCoord(0.1,0.9,0.1,0.9)
 
 			self.Castbar:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -5)
 		end
@@ -718,7 +690,7 @@ local func = function(self, unit)
 	--
 	-- custom aura textures
 	--
-	self.PostCreateAuraIcon = auraIcon
+	self.PostCreateAuraIcon = PostCreateAuraIcon
 	self.SetAuraPosition = auraOffset
 
 	if(self:GetParent():GetName():match"oUF_Party") then
