@@ -94,67 +94,11 @@ local hex = function(r, g, b)
 end
 
 -- ------------------------------------------------------------------------
--- level update
--- ------------------------------------------------------------------------
-local updateLevel = function(self, unit, name)
-	local lvl = UnitLevel(unit)
-	local class = UnitClassification(unit)
-
-	local color = GetDifficultyColor(lvl)
-
-	if lvl <= 0 then lvl = "??" end
-
-	if class=="worldboss" then
-	    self.Level:SetText("|cffff0000"..lvl.."b|r")
-	elseif class=="rareelite" then
-	    self.Level:SetText(lvl.."r+")
-		self.Level:SetTextColor(color.r, color.g, color.b)
-	elseif class=="elite" then
-	    self.Level:SetText(lvl.."+")
-		self.Level:SetTextColor(color.r, color.g, color.b)
-	elseif class=="rare" then
-		self.Level:SetText(lvl.."r")
-		self.Level:SetTextColor(color.r, color.g, color.b)
-	else
-		if UnitIsConnected(unit) == nil then
-			self.Level:SetText("??")
-		else
-			self.Level:SetText(lvl)
-		end
-		if(not UnitIsPlayer(unit)) then
-			self.Level:SetTextColor(color.r, color.g, color.b)
-		else
-			local _, class = UnitClass(unit)
-			color = self.colors.class[class]
-			self.Level:SetTextColor(color[1], color[2], color[3])
-		end
-	end
-end
-
--- ------------------------------------------------------------------------
 -- name update
 -- ------------------------------------------------------------------------
-local updateName = function(self, event, unit)
-	if(self.unit ~= unit) then return end
 
-	local name = UnitName(unit)
-    self.Name:SetText(string.lower(name))
-
-	if unit=="targettarget" then
-		local totName = UnitName(unit)
-		local pName = UnitName("player")
-		if totName==pName then
-			self.Name:SetTextColor(0.9, 0.5, 0.2)
-		else
-			self.Name:SetTextColor(1,1,1)
-		end
-	else
-		self.Name:SetTextColor(1,1,1)
-	end
-
-    if unit=="target" then -- Show level value on targets only
-		updateLevel(self, unit, name)
-    end
+oUF.Tags['[name]'] = function(u, r)
+	return UnitName(r or u):lower() or ''
 end
 
 -- ------------------------------------------------------------------------
@@ -178,15 +122,6 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 	else
 		bar.value:SetText("")
 	end
-	-- elseif(min == max) then
-	-- 	bar.value:SetText(" ")
-	--     else
-	--         if((max-min) < max) then
-	-- 		bar.value:SetText("-"..max-min) -- this makes negative values (easier as a healer)
-	--     end
-	--     end
-
-    self:UNIT_NAME_UPDATE(event, unit)
 end
 
 
@@ -352,18 +287,8 @@ local func = function(self, unit)
     self.Name:SetJustifyH"LEFT"
 	self.Name:SetFont(font, fontsize, "OUTLINE")
 	self.Name:SetShadowOffset(1, -1)
-    self.UNIT_NAME_UPDATE = updateName
-
-	--
-	-- level
-	--
-	self.Level = self.Health:CreateFontString(nil, "OVERLAY")
-	self.Level:SetPoint("LEFT", self.Health, 0, 9)
-	self.Level:SetJustifyH("LEFT")
-	self.Level:SetFont(font, fontsize, "OUTLINE")
-    self.Level:SetTextColor(1,1,1)
-	self.Level:SetShadowOffset(1, -1)
-	self.UNIT_LEVEL = updateLevel
+	self.Name:SetTextColor(1,1,1)
+	self:Tag(self.Name, '[name]')
 
 	--
 	-- oUF_BarFader
@@ -388,7 +313,6 @@ local func = function(self, unit)
         self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH"LEFT"
-		self.Level:Hide()
 
 		--
 		-- leader icon
@@ -425,7 +349,6 @@ local func = function(self, unit)
         self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH"LEFT"
-		self.Level:Hide()
 
 		if playerClass=="HUNTER" then
 			self.Health.colorReaction = false
@@ -462,6 +385,17 @@ local func = function(self, unit)
 	-- target
 	-- ------------------------------------
     if unit=="target" then
+		--
+		-- level
+		--
+		self.Level = self.Health:CreateFontString(nil, "OVERLAY")
+		self.Level:SetPoint("LEFT", self.Health, 0, 9)
+		self.Level:SetJustifyH("LEFT")
+		self.Level:SetFont(font, fontsize, "OUTLINE")
+	    self.Level:SetTextColor(1,1,1)
+		self.Level:SetShadowOffset(1, -1)
+		self:Tag(self.Level, '[level][shortclassification]')
+
 		self:SetWidth(250)
 		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
@@ -541,7 +475,7 @@ local func = function(self, unit)
 		self.Health.value:Hide()
 		self.Name:SetWidth(95)
 		self.Name:SetHeight(18)
-
+		self.Name:SetTextColor(0.9, 0.5, 0.2)
 		--
 		-- raid target icons
 		--
