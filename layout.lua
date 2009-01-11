@@ -218,7 +218,7 @@ end
 -- ------------------------------------------------------------------------
 -- the layout starts here
 -- ------------------------------------------------------------------------
-local func = function(self, unit)
+local SetStyle = function(self, unit)
 	self.menu = menu
 
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
@@ -650,9 +650,9 @@ end
 --
 -- normal frames
 --
-oUF:RegisterStyle("Blomma", func)
-
+oUF:RegisterStyle("Blomma", SetStyle)
 oUF:SetActiveStyle("Blomma")
+
 oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -106)
 oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -106)
 oUF:Spawn("pet", "oUF_Pet"):SetPoint("BOTTOMLEFT", oUF.units.player, 0, -30)
