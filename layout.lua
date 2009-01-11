@@ -182,6 +182,23 @@ local PostCreateRunes = function(self)
 	end
 end
 
+-- ------------------------------------------------------------------------
+-- aura sorting
+-- ------------------------------------------------------------------------
+local function sortIcons(a, b)
+	local unit = a:GetParent():GetParent().unit
+    local _, _, _, _, _, _, expirationTimeA = UnitAura(unit, a:GetID(), a.filter)
+    local _, _, _, _, _, _, expirationTimeB = UnitAura(unit, b:GetID(), b.filter)
+        
+    if(not expirationTimeA) then expirationTimeA = -1 end
+    if(not expirationTimeB) then expirationTimeB = -1 end
+
+    return expirationTimeA > expirationTimeB
+end
+
+local PreSetAuraPosition = function(self, icons, x)
+	sort(icons, sortIcons)
+end
 
 -- ------------------------------------------------------------------------
 -- the layout starts here
@@ -430,9 +447,7 @@ local func = function(self, unit)
 		--
 		-- Aura sorting
 		--
-		if(IsAddOnLoaded('oUF_AuraSort')) then
-			self.sortAuras = {}
-		end
+		self.PreSetAuraPosition = PreSetAuraPosition
 
 		--
 		-- buffs
