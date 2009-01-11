@@ -19,15 +19,8 @@
 local select = select
 local UnitClass = UnitClass
 local UnitIsDead = UnitIsDead
-local UnitIsPVP = UnitIsPVP
 local UnitIsGhost = UnitIsGhost
-local UnitIsPlayer = UnitIsPlayer
-local UnitReaction = UnitReaction
 local UnitIsConnected = UnitIsConnected
-local UnitCreatureType = UnitCreatureType
-local UnitClassification = UnitClassification
-local UnitReactionColor = UnitReactionColor
-local RAID_CLASS_COLORS = RAID_CLASS_COLORS
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -173,8 +166,8 @@ end
 -- ------------------------------------------------------------------------
 local function sortIcons(a, b)
 	local unit = a:GetParent():GetParent().unit
-	local _, _, _, _, _, _, expirationTimeA = UnitAura(unit, a:GetID(), a.filter)
-	local _, _, _, _, _, _, expirationTimeB = UnitAura(unit, b:GetID(), b.filter)
+	local expirationTimeA = select(7, UnitAura(unit, a:GetID(), a.filter))
+	local expirationTimeB = select(7, UnitAura(unit, b:GetID(), b.filter))
 
 	if(not expirationTimeA) then expirationTimeA = -1 end
 	if(not expirationTimeB) then expirationTimeB = -1 end
