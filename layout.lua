@@ -90,6 +90,37 @@ oUF.Tags['[name]'] = function(u, r)
 end
 
 -- ------------------------------------------------------------------------
+-- level update
+-- ------------------------------------------------------------------------
+local function GetDifficultyColor(level)
+	if level == '??' then
+		return  .69,.31,.31
+	else
+	local levelDiff = UnitLevel('target') - UnitLevel('player')
+		if levelDiff >= 5 then
+			return .69,.31,.31
+		elseif levelDiff >= 3 then
+			return .71,.43,.27
+		elseif levelDiff >= -2 then
+			return .84,.75,.65
+		elseif -levelDiff <= GetQuestGreenRange() then
+			return .33,.59,.33
+		else
+			return  .55,.57,.61
+		end
+	end
+end
+
+oUF.Tags['[blommalevel]'] = function(u)
+	local l = not UnitIsConnected(u) and '??' or UnitLevel(u) < 1 and '??' or UnitLevel(u)
+	local c = UnitClassification(u)
+	local r,g,b = GetDifficultyColor(level)
+	local rs = c == "rare" and l.."R" or c == "eliterare" and l.."R+" or c == "elite" and l.."+" or c == "worldboss" and l.."B" or l
+	return string.format("|cff%02x%02x%02x"..rs.. "|r", r*255, g*255, b*255)
+end
+oUF.TagEvents["[blommalevel]"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
+
+-- ------------------------------------------------------------------------
 -- health update
 -- ------------------------------------------------------------------------
 local PostUpdateHealth = function(self, event, unit, bar, min, max)
@@ -362,32 +393,6 @@ local SetStyle = function(self, unit)
 		self.RaidIcon:SetWidth(16)
 		self.RaidIcon:SetPoint("TOP", self, 0, 9)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
-
-		-- ------------------------------------
-		-- autoshot bar
-		-- ------------------------------------
-		if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER') then
-			self.AutoShot = CreateFrame('StatusBar', nil, self)
-			self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
-			self.AutoShot:SetStatusBarTexture(bartex)
-			self.AutoShot:SetStatusBarColor(1, 0.7, 0)
-			self.AutoShot:SetHeight(6)
-			self.AutoShot:SetWidth(250)
-			self.AutoShot:SetBackdrop({
-				bgFile = "Interface\ChatFrame\ChatFrameBackground",
-				insets = {top = -3, left = -3, bottom = -3, right = -3}})
-			self.AutoShot:SetBackdropColor(0, 0, 0)
-
-			self.AutoShot.Time = self.AutoShot:CreateFontString(nil, 'OVERLAY')
-			self.AutoShot.Time:SetPoint('CENTER', self.AutoShot)
-			self.AutoShot.Time:SetFont(upperfont, 11, "OUTLINE")
-			self.AutoShot.Time:SetShadowOffset(1, -1)
-			self.AutoShot.Time:SetTextColor(1, 1, 1)
-
-			self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
-			self.AutoShot.bg:SetAllPoints(self.AutoShot)
-			self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
-		end
 	end
 
 	-- ------------------------------------
@@ -448,7 +453,7 @@ local SetStyle = function(self, unit)
 		self.Level:SetFont(font, fontsize, "OUTLINE")
 		self.Level:SetTextColor(1,1,1)
 		self.Level:SetShadowOffset(1, -1)
-		self:Tag(self.Level, '[level][shortclassification]')
+		self:Tag(self.Level, '[blommalevel]')
 
 		self:SetWidth(250)
 		self:SetHeight(20)
@@ -591,6 +596,32 @@ local SetStyle = function(self, unit)
 		self.Castbar.Time:SetFont(upperfont, 12, "OUTLINE")
 		self.Castbar.Time:SetTextColor(1, 1, 1)
 		self.Castbar.Time:SetJustifyH('RIGHT')
+	end
+
+	-- ------------------------------------
+	-- autoshot bar
+	-- ------------------------------------
+	if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER' and unit == 'player') then
+		self.AutoShot = CreateFrame('StatusBar', nil, self)
+		self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
+		self.AutoShot:SetStatusBarTexture(bartex)
+		self.AutoShot:SetStatusBarColor(1, 0.7, 0)
+		self.AutoShot:SetHeight(6)
+		self.AutoShot:SetWidth(250)
+		self.AutoShot:SetBackdrop({
+			bgFile = "Interface\ChatFrame\ChatFrameBackground",
+			insets = {top = -3, left = -3, bottom = -3, right = -3}})
+		self.AutoShot:SetBackdropColor(0, 0, 0)
+
+		self.AutoShot.Text = self.AutoShot:CreateFontString(nil, 'OVERLAY')
+		self.AutoShot.Text:SetPoint('CENTER', self.AutoShot)
+		self.AutoShot.Text:SetFont(upperfont, 11, "OUTLINE")
+		self.AutoShot.Text:SetShadowOffset(1, -1)
+		self.AutoShot.Text:SetTextColor(1, 1, 1)
+
+		self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
+		self.AutoShot.bg:SetAllPoints(self.AutoShot)
+		self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
 	end
 
 	-- ------------------------------------
