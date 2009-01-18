@@ -468,14 +468,15 @@ local SetStyle = function(self, unit)
 		--
 		-- combo points
 		--
-		if(playerClass=="ROGUE" or playerClass=="DRUID") then
+		--if(playerClass=="ROGUE" or playerClass=="DRUID") then
 			self.CPoints = self:CreateFontString(nil, "OVERLAY")
 			self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
 			self.CPoints:SetFont(font, 38, "OUTLINE")
 			self.CPoints:SetTextColor(0, 0.81, 1)
 			self.CPoints:SetShadowOffset(1, -1)
-			self.CPoints:SetJustifyH"RIGHT"
-		end
+			self.CPoints:SetJustifyH("RIGHT")
+			self.CPoints.unit = 'player'
+		--end
 
 		--
 		-- raid target icons
@@ -659,6 +660,8 @@ local SetStyle = function(self, unit)
 	-- custom aura textures
 	--
 	self.PostCreateAuraIcon = PostCreateAuraIcon
+
+	self.disallowVehicleSwap = true
 
 	if(self:GetParent():GetName():match"oUF_Party") then
 		self:SetAttribute('initial-height', 20)
