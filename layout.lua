@@ -450,11 +450,6 @@ local SetStyle = function(self, unit)
 		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 
 		--
-		-- Aura sorting
-		--
-		self.PreSetAuraPosition = PreSetAuraPosition
-
-		--
 		-- buffs
 		--
 		self.Buffs = CreateFrame("Frame", nil, self)
@@ -481,6 +476,11 @@ local SetStyle = function(self, unit)
 		self.Debuffs.filter = "HARMFUL|PLAYER"
 		self.Debuffs.num = 10
 		self.Debuffs.spacing = 2
+
+		--
+		-- Aura debuff sorting
+		--
+		self.Debuffs.PreSetAuraPosition = PreSetAuraPosition
 	end
 
 	-- ------------------------------------
