@@ -196,7 +196,7 @@ end
 -- ------------------------------------------------------------------------
 -- aura sorting
 -- ------------------------------------------------------------------------
-local function sortIcons(a, b)
+local sortIcons = function(a, b)
 	local unit = a:GetParent():GetParent().unit
 	local expirationTimeA = select(7, UnitAura(unit, a:GetID(), a.filter))
 	local expirationTimeB = select(7, UnitAura(unit, b:GetID(), b.filter))
@@ -207,44 +207,8 @@ local function sortIcons(a, b)
 	return expirationTimeA > expirationTimeB
 end
 
-local SetAuraPosition = function(self, icons, x)
-	if(icons and x > 0) then
-
-		sort(icons, sortIcons)
-
-		local col = 0
-		local row = 0
-		local spacing = icons.spacing or 0
-		local gap = icons.gap
-		local size = (icons.size or 16) + spacing
-		local anchor = icons.initialAnchor or "BOTTOMLEFT"
-		local growthx = (icons["growth-x"] == "LEFT" and -1) or 1
-		local growthy = (icons["growth-y"] == "DOWN" and -1) or 1
-		local cols = math.floor(icons:GetWidth() / size + .5)
-		local rows = math.floor(icons:GetHeight() / size + .5)
-
-		for i = 1, x do
-			local button = icons[i]
-			if(button and button:IsShown()) then
-				if(gap and button.debuff) then
-					if(col > 0) then
-						col = col + 1
-					end
-
-					gap = false
-				end
-
-				if(col >= cols) then
-					col = 0
-					row = row + 1
-				end
-				button:ClearAllPoints()
-				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
-
-				col = col + 1
-			end
-		end
-	end
+local PreSetAuraPosition = function(self,icons,x)
+	sort(icons, sortIcons)
 end
 
 -- ------------------------------------------------------------------------
@@ -468,15 +432,13 @@ local SetStyle = function(self, unit)
 		--
 		-- combo points
 		--
-		--if(playerClass=="ROGUE" or playerClass=="DRUID") then
-			self.CPoints = self:CreateFontString(nil, "OVERLAY")
-			self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
-			self.CPoints:SetFont(font, 38, "OUTLINE")
-			self.CPoints:SetTextColor(0, 0.81, 1)
-			self.CPoints:SetShadowOffset(1, -1)
-			self.CPoints:SetJustifyH("RIGHT")
-			self.CPoints.unit = 'player'
-		--end
+		self.CPoints = self:CreateFontString(nil, "OVERLAY")
+		self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
+		self.CPoints:SetFont(font, 38, "OUTLINE")
+		self.CPoints:SetTextColor(0, 0.81, 1)
+		self.CPoints:SetShadowOffset(1, -1)
+		self.CPoints:SetJustifyH("RIGHT")
+		self.CPoints.unit = 'player'
 
 		--
 		-- raid target icons
@@ -490,7 +452,7 @@ local SetStyle = function(self, unit)
 		--
 		-- Aura sorting
 		--
-		self.SetAuraPosition = SetAuraPosition
+		self.PreSetAuraPosition = PreSetAuraPosition
 
 		--
 		-- buffs
@@ -502,8 +464,8 @@ local SetStyle = function(self, unit)
 		self.Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -2, 15)
 		self.Buffs.initialAnchor = "BOTTOMLEFT"
 		self.Buffs["growth-y"] = "TOP"
-		self.Buffs.filter = "HELPFUL|PLAYER"
-		self.Buffs.num = 20
+		self.Buffs.filter = "HELPFUL"
+		self.Buffs.num = 40
 		self.Buffs.spacing = 2
 
 		--
@@ -517,7 +479,7 @@ local SetStyle = function(self, unit)
 		self.Debuffs.initialAnchor = "TOPLEFT"
 		self.Debuffs["growth-y"] = "TOP"
 		self.Debuffs.filter = "HARMFUL|PLAYER"
-		self.Debuffs.num = 40
+		self.Debuffs.num = 10
 		self.Debuffs.spacing = 2
 	end
 
