@@ -5,8 +5,7 @@
 	Author:		Blomma
 	Mail:		blomma@gmail.com
 
-	Credits:
-				oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
+	Credits:	oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
 				oUF_TsoHG (used as base) / http://www.wowinterface.com/downloads/info8739-oUF_TsoHG.html
 				Rothar for buff border (and Neal for the edited version)
 				p3lim for party toggle function
@@ -65,17 +64,6 @@ local menu = function(self)
 	end
 end
 
--- local menu = function(self)
---	local unit = self.unit:sub(1, -2)
---	local cunit = self.unit:gsub("(.)", string.upper, 1)
---
---	if(unit == "party" or unit == "partypet") then
---		ToggleDropDownMenu(1, nil, _G["PartyMemberFrame"..self.id.."DropDown"], "cursor", 0, 0)
---	elseif(_G[cunit.."FrameDropDown"]) then
---		ToggleDropDownMenu(1, nil, _G[cunit.."FrameDropDown"], "cursor", 0, 0)
---	end
--- end
-
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
@@ -92,7 +80,7 @@ end
 -- ------------------------------------------------------------------------
 -- returns the hex code of a rgb value
 -- ------------------------------------------------------------------------
-local hex = function(r, g, b)
+local rgbtohex = function(r, g, b)
 	if type(r) == "table" then
 		if r.r then
 			r, g, b = r.r, r.g, r.b
@@ -113,22 +101,21 @@ end
 -- ------------------------------------------------------------------------
 -- level update
 -- ------------------------------------------------------------------------
-local function GetDifficultyColor(level)
+local GetDifficultyColor = function(level)
+	local levelDiff = UnitLevel('target') - UnitLevel('player')
+
 	if level == '??' then
 		return	.69,.31,.31
+	elseif levelDiff >= 5 then
+		return .69,.31,.31
+	elseif levelDiff >= 3 then
+		return .71,.43,.27
+	elseif levelDiff >= -2 then
+		return .84,.75,.65
+	elseif -levelDiff <= GetQuestGreenRange() then
+		return .33,.59,.33
 	else
-	local levelDiff = UnitLevel('target') - UnitLevel('player')
-		if levelDiff >= 5 then
-			return .69,.31,.31
-		elseif levelDiff >= 3 then
-			return .71,.43,.27
-		elseif levelDiff >= -2 then
-			return .84,.75,.65
-		elseif -levelDiff <= GetQuestGreenRange() then
-			return .33,.59,.33
-		else
-			return	.55,.57,.61
-		end
+		return	.55,.57,.61
 	end
 end
 
@@ -168,29 +155,19 @@ end
 -- power update
 -- ------------------------------------------------------------------------
 local PostUpdatePower = function(self, event, unit, bar, min, max)
-	local _, ptype = UnitPowerType(unit)
-	local color = oUF.colors.power[ptype]
+	local ptype, ptypestr = UnitPowerType(unit)
+	local color = oUF.colors.power[ptypestr]
 	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
 		bar:SetValue(0)
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText()
-	elseif(unit=="player") then
-		if(playerClass == "DEATHKNIGHT" and min == 0) then
+	elseif(unit=="player" or unit=="pet") then
+		if(min==max or (ptype==6 and min == 0)) then
 			bar.value:SetText()
-		elseif(min==max) then
-			bar.value:SetText()
+		elseif(ptype==1 or ptype==3 or ptype==6 or ptype==2) then
+			bar.value:SetText(rgbtohex(color)..truncate(min).."|r")
 		else
-			if(playerClass == "DEATHKNIGHT") then
-				bar.value:SetText(hex(color)..truncate(min).."|r")
-			else
-				bar.value:SetText(hex(color)..truncate(min).."|r.".. floor(min/max*100).."%")
-			end
-		end
-	elseif(unit=="pet") then
-		if(min==max) then
-			bar.value:SetText()
-		else
-			bar.value:SetText(hex(color)..truncate(min).."|r")
+			bar.value:SetText(rgbtohex(color)..truncate(min).."|r.".. floor(min/max*100).."%")
 		end
 	end
 end
