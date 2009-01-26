@@ -1,8 +1,8 @@
 ## Interface: 30000
 ## Author: Blomma
-## Version: 30000.1.3
+## Version: 30000.1.3.3
 ## Title: oUF Blomma
 ## RequiredDeps: oUF
 ## OptionalDeps: oUF_AutoShot oUF_BarFader
 
-layout.lua
+oUF_Blomma.lua
