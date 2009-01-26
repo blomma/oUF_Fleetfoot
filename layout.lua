@@ -35,25 +35,46 @@ local playerClass = select(2, UnitClass("player"))
 -- ------------------------------------------------------------------------
 -- change some colors :)
 -- ------------------------------------------------------------------------
-oUF.colors.happiness = {
-	[1] = {182/225, 34/255, 32/255},	-- unhappy
-	[2] = {220/225, 180/225, 52/225},	-- content
-	[3] = {143/255, 194/255, 32/255},	-- happy
-}
+local colors = setmetatable({
+	runes = setmetatable({
+		[1] = {0.77, 0.12, 0.23},
+		[2] = {0.3, 0.8, 0.1},
+		[3] = {0, 0.4, 0.7},
+		[4] = {0.8, 0.8, 0.8},
+	}, {__index = oUF.colors.runes}),
+	happiness = setmetatable({
+		[1] = {182/225, 34/255, 32/255},	-- unhappy
+		[2] = {220/225, 180/225, 52/225},	-- content
+		[3] = {143/255, 194/255, 32/255},	-- happy
+	}, {__index = oUF.colors.happiness}),
+}, {__index = oUF.colors})
+
+-- oUF.colors.happiness = {
+--	[1] = {182/225, 34/255, 32/255},	-- unhappy
+--	[2] = {220/225, 180/225, 52/225},	-- content
+--	[3] = {143/255, 194/255, 32/255},	-- happy
+-- }
 
 -- ------------------------------------------------------------------------
 -- right click
 -- ------------------------------------------------------------------------
 local menu = function(self)
-	local unit = self.unit:sub(1, -2)
-	local cunit = self.unit:gsub("(.)", string.upper, 1)
-
-	if(unit == "party" or unit == "partypet") then
-		ToggleDropDownMenu(1, nil, _G["PartyMemberFrame"..self.id.."DropDown"], "cursor", 0, 0)
-	elseif(_G[cunit.."FrameDropDown"]) then
-		ToggleDropDownMenu(1, nil, _G[cunit.."FrameDropDown"], "cursor", 0, 0)
+	local unit = string.gsub(self.unit, '(.)', string.upper, 1)
+	if(_G[unit..'FrameDropDown']) then
+		ToggleDropDownMenu(1, nil, _G[unit..'FrameDropDown'], 'cursor')
 	end
 end
+
+-- local menu = function(self)
+--	local unit = self.unit:sub(1, -2)
+--	local cunit = self.unit:gsub("(.)", string.upper, 1)
+--
+--	if(unit == "party" or unit == "partypet") then
+--		ToggleDropDownMenu(1, nil, _G["PartyMemberFrame"..self.id.."DropDown"], "cursor", 0, 0)
+--	elseif(_G[cunit.."FrameDropDown"]) then
+--		ToggleDropDownMenu(1, nil, _G[cunit.."FrameDropDown"], "cursor", 0, 0)
+--	end
+-- end
 
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
@@ -94,7 +115,7 @@ end
 -- ------------------------------------------------------------------------
 local function GetDifficultyColor(level)
 	if level == '??' then
-		return  .69,.31,.31
+		return	.69,.31,.31
 	else
 	local levelDiff = UnitLevel('target') - UnitLevel('player')
 		if levelDiff >= 5 then
@@ -106,7 +127,7 @@ local function GetDifficultyColor(level)
 		elseif -levelDiff <= GetQuestGreenRange() then
 			return .33,.59,.33
 		else
-			return  .55,.57,.61
+			return	.55,.57,.61
 		end
 	end
 end
@@ -132,7 +153,7 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 		bar.value:SetText("Ghost")
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText("Offline")
-    elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
+	elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
 			bar.value:SetText("|cff33EE44"..truncate(min) .."|r.".. floor(min/max*100).."%")
 		else
@@ -155,7 +176,7 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 		bar.value:SetText()
 	elseif(unit=="player") then
 		if(playerClass == "DEATHKNIGHT" and min == 0) then
-			bar.value:SetText()			
+			bar.value:SetText()
 		elseif(min==max) then
 			bar.value:SetText()
 		else
@@ -216,11 +237,12 @@ end
 -- ------------------------------------------------------------------------
 local SetStyle = function(self, unit)
 	self.menu = menu
+	self.colors = colors
 
 	self:SetScript("OnEnter", UnitFrame_OnEnter)
 	self:SetScript("OnLeave", UnitFrame_OnLeave)
 
-	self:RegisterForClicks"anyup"
+	self:RegisterForClicks("anyup")
 	self:SetAttribute("*type2", "menu")
 
 	--
@@ -341,6 +363,25 @@ local SetStyle = function(self, unit)
 		self.Power.value:SetJustifyH"LEFT"
 
 		--
+		-- buffs
+		--
+		self.Buffs = CreateFrame("Frame", nil, self)
+		self.Buffs.size = 30
+		self.Buffs:SetHeight(self.Buffs.size)
+		self.Buffs:SetWidth(self.Buffs.size * 5)
+		self.Buffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -180)
+		self.Buffs.initialAnchor = "TOPLEFT"
+		self.Buffs["growth-y"] = "DOWN"
+		self.Buffs.filter = "HELPFUL|PLAYER"
+		self.Buffs.num = 10
+		self.Buffs.spacing = 2
+
+		--
+		-- Aura buff sorting
+		--
+		self.Buffs.PreSetAuraPosition = PreSetAuraPosition
+
+		--
 		-- leader icon
 		--
 		self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
@@ -407,7 +448,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- target
 	-- ------------------------------------
-    if unit=="target" then
+	if unit=="target" then
 		--
 		-- level
 		--
@@ -470,7 +511,8 @@ local SetStyle = function(self, unit)
 		self.Debuffs.size = 35
 		self.Debuffs:SetHeight(self.Debuffs.size)
 		self.Debuffs:SetWidth(self.Debuffs.size * 5)
-		self.Debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -247, 40)
+		self.Debuffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -80)
+		--self.Debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -247, 40)
 		self.Debuffs.initialAnchor = "TOPLEFT"
 		self.Debuffs["growth-y"] = "TOP"
 		self.Debuffs.filter = "HARMFUL|PLAYER"
@@ -608,7 +650,6 @@ local SetStyle = function(self, unit)
 		self:SetHeight(15)
 		self.Health:SetHeight(13)
 		self.Power:SetHeight(2)
-		--self.Power:Hide()
 		self.Health:SetFrameLevel(2)
 		self.Power:SetFrameLevel(2)
 		self.Health.value:Hide()
@@ -655,7 +696,7 @@ oUF:Spawn("focus", "oUF_Focus"):SetPoint("BOTTOMRIGHT", oUF.units.player, 0, -30
 --
 -- party
 --
-local party	= oUF:Spawn("header", "oUF_Party")
+local party = oUF:Spawn("header", "oUF_Party")
 party:SetManyAttributes("showParty", true, "yOffset", -15, "showPlayer", false)
 party:SetPoint("TOPLEFT", 20, -20)
 party:Show()
