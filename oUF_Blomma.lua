@@ -206,6 +206,7 @@ local sortIcons = function(a, b)
 end
 
 local PreSetAuraPosition = function(self,icons,x)
+	--ChatFrame1:AddMessage("PreSetAuraPosition")
 	sort(icons, sortIcons)
 end
 
@@ -342,21 +343,21 @@ local SetStyle = function(self, unit)
 		--
 		-- buffs
 		--
-		self.Buffs = CreateFrame("Frame", nil, self)
-		self.Buffs.size = 30
-		self.Buffs:SetHeight(self.Buffs.size)
-		self.Buffs:SetWidth(self.Buffs.size * 5)
-		self.Buffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -180)
-		self.Buffs.initialAnchor = "TOPLEFT"
-		self.Buffs["growth-y"] = "DOWN"
-		self.Buffs.filter = "HELPFUL|PLAYER"
-		self.Buffs.num = 10
-		self.Buffs.spacing = 2
+		-- self.Buffs = CreateFrame("Frame", nil, self)
+		-- self.Buffs.size = 30
+		-- self.Buffs:SetHeight(self.Buffs.size)
+		-- self.Buffs:SetWidth(self.Buffs.size * 5)
+		-- self.Buffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -180)
+		-- self.Buffs.initialAnchor = "TOPLEFT"
+		-- self.Buffs["growth-y"] = "DOWN"
+		-- self.Buffs.filter = "HELPFUL|PLAYER"
+		-- self.Buffs.num = 10
+		-- self.Buffs.spacing = 2
 
 		--
 		-- Aura buff sorting
 		--
-		self.Buffs.PreSetAuraPosition = PreSetAuraPosition
+		-- self.Buffs.PreSetAuraPosition = PreSetAuraPosition
 
 		--
 		-- leader icon
@@ -489,7 +490,6 @@ local SetStyle = function(self, unit)
 		self.Debuffs:SetHeight(self.Debuffs.size)
 		self.Debuffs:SetWidth(self.Debuffs.size * 5)
 		self.Debuffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -80)
-		--self.Debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -247, 40)
 		self.Debuffs.initialAnchor = "TOPLEFT"
 		self.Debuffs["growth-y"] = "TOP"
 		self.Debuffs.filter = "HARMFUL|PLAYER"
@@ -499,7 +499,7 @@ local SetStyle = function(self, unit)
 		--
 		-- Aura debuff sorting
 		--
-		self.Debuffs.PreSetAuraPosition = PreSetAuraPosition
+		self.PreSetAuraPosition = PreSetAuraPosition
 	end
 
 	-- ------------------------------------
