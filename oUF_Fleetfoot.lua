@@ -347,6 +347,14 @@ local SetStyle = function(self, unit)
 	self:Tag(self.Name, '[name]')
 
 	--
+	-- leader icon
+	--
+	self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
+	self.Leader:SetHeight(12)
+	self.Leader:SetWidth(12)
+	self.Leader:SetPoint("BOTTOMRIGHT", self, -2, 4)
+
+	--
 	-- oUF_BarFader
 	--
 	if(IsAddOnLoaded('oUF_BarFader')) then
@@ -366,24 +374,6 @@ local SetStyle = function(self, unit)
 		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH"LEFT"
-
-		--
-		-- leader icon
-		--
-		self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
-		self.Leader:SetHeight(12)
-		self.Leader:SetWidth(12)
-		self.Leader:SetPoint("BOTTOMRIGHT", self, -2, 4)
-		self.Leader:SetTexture"Interface\\GroupFrame\\UI-Group-LeaderIcon"
-
-		--
-		-- raid target icons
-		--
-		self.RaidIcon = self.Health:CreateTexture(nil, "OVERLAY")
-		self.RaidIcon:SetHeight(16)
-		self.RaidIcon:SetWidth(16)
-		self.RaidIcon:SetPoint("TOP", self, 0, 9)
-		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 	end
 
 	-- ------------------------------------
@@ -479,7 +469,6 @@ local SetStyle = function(self, unit)
 		self.RaidIcon:SetHeight(24)
 		self.RaidIcon:SetWidth(24)
 		self.RaidIcon:SetPoint("RIGHT", self, 30, 0)
-		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 
 		--
 		-- buffs
@@ -541,7 +530,6 @@ local SetStyle = function(self, unit)
 		self.RaidIcon:SetHeight(16)
 		self.RaidIcon:SetWidth(16)
 		self.RaidIcon:SetPoint("RIGHT", self, 0, 9)
-		self.RaidIcon:SetTexture"Interface\\TargetingFrame\\UI-RaidTargetingIcons"
 	end
 
 	-- ------------------------------------
