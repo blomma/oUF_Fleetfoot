@@ -1,8 +1,8 @@
 ﻿--[[
 
-	oUF_Blomma
+	oUF_Fleetfoot
 
-	Author:		Blomma
+	Author:		Fleetfoot
 	Mail:		blomma@gmail.com
 
 	Credits:	oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
@@ -26,11 +26,11 @@ local sformat = string.format
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
 -- ------------------------------------------------------------------------
-local font = "Interface\\AddOns\\oUF_Blomma\\fonts\\font.ttf"
-local upperfont = "Interface\\AddOns\\oUF_Blomma\\fonts\\upperfont.ttf"
+local font = "Interface\\AddOns\\oUF_Fleetfoot\\fonts\\font.ttf"
+local upperfont = "Interface\\AddOns\\oUF_Fleetfoot\\fonts\\upperfont.ttf"
 local fontsize = 15
-local bartex = "Interface\\AddOns\\oUF_Blomma\\textures\\statusbar"
-local bufftex = "Interface\\AddOns\\oUF_Blomma\\textures\\border"
+local bartex = "Interface\\AddOns\\oUF_Fleetfoot\\textures\\statusbar"
+local bufftex = "Interface\\AddOns\\oUF_Fleetfoot\\textures\\border"
 local playerClass = select(2, UnitClass("player"))
 
 -- ------------------------------------------------------------------------
@@ -109,14 +109,14 @@ local GetDifficultyColor = function(level)
 	end
 end
 
-oUF.Tags['[blommalevel]'] = function(u)
+oUF.Tags['[targetlevel]'] = function(u)
 	local l = not UnitIsConnected(u) and '??' or UnitLevel(u) < 1 and '??' or UnitLevel(u)
 	local c = UnitClassification(u)
 	local r,g,b = GetDifficultyColor(level)
 	local rs = c == "rare" and l.."R" or c == "eliterare" and l.."R+" or c == "elite" and l.."+" or c == "worldboss" and l.."B" or l
 	return string.format("|cff%02x%02x%02x"..rs.. "|r", r*255, g*255, b*255)
 end
-oUF.TagEvents["[blommalevel]"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
+oUF.TagEvents["[targetlevel]"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
 
 -- ------------------------------------------------------------------------
 -- health update
@@ -449,7 +449,7 @@ local SetStyle = function(self, unit)
 		self.Level:SetFont(font, fontsize, "OUTLINE")
 		self.Level:SetTextColor(1,1,1)
 		self.Level:SetShadowOffset(1, -1)
-		self:Tag(self.Level, '[blommalevel]')
+		self:Tag(self.Level, '[targetlevel]')
 
 		self:SetWidth(250)
 		self:SetHeight(20)
@@ -674,8 +674,8 @@ end
 --
 -- normal frames
 --
-oUF:RegisterStyle("Blomma", SetStyle)
-oUF:SetActiveStyle("Blomma")
+oUF:RegisterStyle("Fleetfoot", SetStyle)
+oUF:SetActiveStyle("Fleetfoot")
 
 oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -106)
 oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -106)
