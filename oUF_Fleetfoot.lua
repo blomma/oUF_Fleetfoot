@@ -262,13 +262,13 @@ local SetStyle = function(self, unit)
 	--
 	-- healthbar
 	--
-	self.Health = CreateFrame"StatusBar"
+	self.Health = CreateFrame("StatusBar")
 	self.Health:SetHeight(19)
 	self.Health:SetStatusBarTexture(bartex)
 	self.Health:SetParent(self)
-	self.Health:SetPoint"TOP"
-	self.Health:SetPoint"LEFT"
-	self.Health:SetPoint"RIGHT"
+	self.Health:SetPoint("TOP")
+	self.Health:SetPoint("LEFT")
+	self.Health:SetPoint("RIGHT")
 	--
 	-- healthbar background
 	--
@@ -299,7 +299,7 @@ local SetStyle = function(self, unit)
 	--
 	-- powerbar
 	--
-	self.Power = CreateFrame"StatusBar"
+	self.Power = CreateFrame("StatusBar")
 	self.Power:SetHeight(3)
 	self.Power:SetStatusBarTexture(bartex)
 	self.Power:SetParent(self)
@@ -364,7 +364,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- player
 	-- ------------------------------------
-	if unit=="player" then
+	if(unit == "player") then
 		self:SetWidth(250)
 		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
@@ -373,13 +373,13 @@ local SetStyle = function(self, unit)
 		self.Power:SetHeight(3)
 		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
-		self.Power.value:SetJustifyH"LEFT"
+		self.Power.value:SetJustifyH("LEFT")
 	end
 
 	-- ------------------------------------
 	-- pet
 	-- ------------------------------------
-	if unit=="pet" then
+	if(unit == "pet") then
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(15.5)
@@ -388,9 +388,9 @@ local SetStyle = function(self, unit)
 		self.Power:SetHeight(3)
 		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
-		self.Power.value:SetJustifyH"LEFT"
+		self.Power.value:SetJustifyH("LEFT")
 
-		if playerClass=="HUNTER" then
+		if(playerClass == "HUNTER") then
 			self.Health.colorReaction = false
 			self.Health.colorClass = false
 			self.Health.colorHappiness = true
@@ -418,7 +418,7 @@ local SetStyle = function(self, unit)
 		self.CPoints:SetFont(font, 38, "OUTLINE")
 		self.CPoints:SetTextColor(0, 0.81, 1)
 		self.CPoints:SetShadowOffset(1, -1)
-		self.CPoints:SetJustifyH"RIGHT"
+		self.CPoints:SetJustifyH("RIGHT")
 
 		--
 		-- custom aura textures
@@ -429,7 +429,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- target
 	-- ------------------------------------
-	if unit=="target" then
+	if(unit == "target") then
 		--
 		-- level
 		--
@@ -512,7 +512,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- target of target and focus
 	-- ------------------------------------
-	if unit=="targettarget" or unit=="focus" then
+	if(unit == "targettarget" or unit == "focus") then
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(18)
@@ -615,7 +615,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- party
 	-- ------------------------------------
-	if(self:GetParent():GetName():match"oUF_Party") then
+	if(self:GetParent():GetName():match("oUF_Party")) then
 		self:SetWidth(160)
 		self:SetHeight(20)
 		self.Health:SetHeight(15)
@@ -628,7 +628,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- raid
 	-- ------------------------------------
-	if(self:GetParent():GetName():match"oUF_Raid") then
+	if(self:GetParent():GetName():match("oUF_Raid")) then
 		self:SetWidth(50)
 		self:SetHeight(15)
 		self.Health:SetHeight(13)
@@ -644,7 +644,7 @@ local SetStyle = function(self, unit)
 
 	self.disallowVehicleSwap = true
 
-	if(self:GetParent():GetName():match"oUF_Party") then
+	if(self:GetParent():GetName():match("oUF_Party")) then
 		self:SetAttribute('initial-height', 20)
 		self:SetAttribute('initial-width', 160)
 	else
