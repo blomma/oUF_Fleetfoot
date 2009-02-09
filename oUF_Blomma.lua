@@ -16,10 +16,12 @@
 -- local horror
 -- ------------------------------------------------------------------------
 local select = select
-local UnitClass = UnitClass
 local UnitIsDead = UnitIsDead
 local UnitIsGhost = UnitIsGhost
 local UnitIsConnected = UnitIsConnected
+local UnitAura = UnitAura
+local UnitPowerType = UnitPowerType
+local sformat = string.format
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -35,24 +37,12 @@ local playerClass = select(2, UnitClass("player"))
 -- change some colors :)
 -- ------------------------------------------------------------------------
 local colors = setmetatable({
-	runes = setmetatable({
-		[1] = {0.77, 0.12, 0.23},
-		[2] = {0.3, 0.8, 0.1},
-		[3] = {0, 0.4, 0.7},
-		[4] = {0.8, 0.8, 0.8},
-	}, {__index = oUF.colors.runes}),
 	happiness = setmetatable({
 		[1] = {182/225, 34/255, 32/255},	-- unhappy
 		[2] = {220/225, 180/225, 52/225},	-- content
 		[3] = {143/255, 194/255, 32/255},	-- happy
 	}, {__index = oUF.colors.happiness}),
 }, {__index = oUF.colors})
-
--- oUF.colors.happiness = {
---	[1] = {182/225, 34/255, 32/255},	-- unhappy
---	[2] = {220/225, 180/225, 52/225},	-- content
---	[3] = {143/255, 194/255, 32/255},	-- happy
--- }
 
 -- ------------------------------------------------------------------------
 -- right click
@@ -69,9 +59,9 @@ end
 -- ------------------------------------------------------------------------
 local truncate = function(value)
 	if(value >= 1e6) then
-		return string.format('%dm', value / 1e6)
+		return sformat('%dm', value / 1e6)
 	elseif(value >= 1e4) then
-		return string.format('%dk', value / 1e3)
+		return sformat('%dk', value / 1e3)
 	else
 		return value
 	end
@@ -88,7 +78,7 @@ local rgbtohex = function(r, g, b)
 			r, g, b = unpack(r)
 		end
 	end
-	return string.format("|cff%02x%02x%02x", r*255, g*255, b*255)
+	return sformat("|cff%02x%02x%02x", r*255, g*255, b*255)
 end
 
 -- ------------------------------------------------------------------------
@@ -178,36 +168,37 @@ end
 local PostCreateAuraIcon = function(self, button, icons)
 	icons.showDebuffType = true -- show debuff border type color
 
-	button.icon:SetTexCoord(.07, .93, .07, .93)
-	button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
-	button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
+	local icon = button.icon
+	icon:SetTexCoord(.07, .93, .07, .93)
+	icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
+	icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
 
-	button.overlay:SetTexture(bufftex)
-	button.overlay:SetTexCoord(0,1,0,1)
-	button.overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
+	local overlay = button.overlay
+	overlay:SetTexture(bufftex)
+	overlay:SetTexCoord(0,1,0,1)
+	overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
 
-	button.cd:SetReverse()
-	button.cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-	button.cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+	local cd = button.cd
+	cd:SetReverse()
+	cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
+	cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
 end
 
 -- ------------------------------------------------------------------------
 -- aura sorting
 -- ------------------------------------------------------------------------
+local sortunit
 local sortIcons = function(a, b)
-	local unit = a:GetParent():GetParent().unit
-	local expirationTimeA = select(7, UnitAura(unit, a:GetID(), a.filter))
-	local expirationTimeB = select(7, UnitAura(unit, b:GetID(), b.filter))
+	local aet = select(7, UnitAura(sortunit, a:GetID(), a.filter)) or -1
+	local bet = select(7, UnitAura(sortunit, b:GetID(), b.filter)) or -1
 
-	if(not expirationTimeA) then expirationTimeA = -1 end
-	if(not expirationTimeB) then expirationTimeB = -1 end
-
-	return expirationTimeA > expirationTimeB
+	return aet > bet
 end
 
 local SetAuraPosition = function(self, icons, x)
 	if(icons and x > 0) then
 		if( icons.visibleDebuffs ) then
+			sortunit = self.unit
 			sort(icons, sortIcons)
 		end
 
