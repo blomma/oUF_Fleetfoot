@@ -166,7 +166,7 @@ end
 -- aura reskin
 -- ------------------------------------------------------------------------
 local PostCreateAuraIcon = function(self, button, icons)
-	icons.showDebuffType = true -- show debuff border type color
+	icons.showDebuffType = true
 
 	local icon = button.icon
 	icon:SetTexCoord(.07, .93, .07, .93)
@@ -429,6 +429,11 @@ local SetStyle = function(self, unit)
 		self.CPoints:SetTextColor(0, 0.81, 1)
 		self.CPoints:SetShadowOffset(1, -1)
 		self.CPoints:SetJustifyH"RIGHT"
+
+		--
+		-- custom aura textures
+		--
+		self.PostCreateAuraIcon = PostCreateAuraIcon
 	end
 
 	-- ------------------------------------
@@ -508,6 +513,11 @@ local SetStyle = function(self, unit)
 		-- Aura debuff sorting
 		--
 		self.SetAuraPosition = SetAuraPosition
+
+		--
+		-- custom aura textures
+		--
+		self.PostCreateAuraIcon = PostCreateAuraIcon
 	end
 
 	-- ------------------------------------
@@ -643,11 +653,6 @@ local SetStyle = function(self, unit)
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
 	end
-
-	--
-	-- custom aura textures
-	--
-	self.PostCreateAuraIcon = PostCreateAuraIcon
 
 	self.disallowVehicleSwap = true
 
