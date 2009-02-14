@@ -1,8 +1,8 @@
 ## Interface: 30000
 ## Author: Blomma
 ## Version: 30000.1.3.3
-## Title: oUF Blomma
+## Title: oUF Fleetfoot
 ## RequiredDeps: oUF
 ## OptionalDeps: oUF_AutoShot oUF_BarFader
 
-oUF_Blomma.lua
+oUF_Fleetfoot.lua

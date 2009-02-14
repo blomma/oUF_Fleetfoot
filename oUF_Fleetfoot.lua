@@ -21,7 +21,6 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsConnected = UnitIsConnected
 local UnitAura = UnitAura
 local UnitPowerType = UnitPowerType
-local sformat = string.format
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -51,17 +50,24 @@ local menu = function(self)
 	local unit = string.gsub(self.unit, '(.)', string.upper, 1)
 	if(_G[unit..'FrameDropDown']) then
 		ToggleDropDownMenu(1, nil, _G[unit..'FrameDropDown'], 'cursor')
+	elseif(self.unit:match('party')) then
+		ToggleDropDownMenu(1, nil, _G['PartyMemberFrame'..self.id..'DropDown'], 'cursor')
+	else
+		FriendsDropDown.unit = self.unit
+		FriendsDropDown.id = self.id
+		FriendsDropDown.initialize = RaidFrameDropDown_Initialize
+		ToggleDropDownMenu(1, nil, FriendsDropDown, 'cursor')
 	end
 end
 
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
-local truncate = function(value)
+local ShortValue = function(value)
 	if(value >= 1e6) then
-		return sformat('%dm', value / 1e6)
+		return ('%dm'):format(value / 1e6)
 	elseif(value >= 1e4) then
-		return sformat('%dk', value / 1e3)
+		return ('%dk'):format(value / 1e3)
 	else
 		return value
 	end
@@ -70,7 +76,7 @@ end
 -- ------------------------------------------------------------------------
 -- returns the hex code of a rgb value
 -- ------------------------------------------------------------------------
-local rgbtohex = function(r, g, b)
+local RGBToHexh = function(r, g, b)
 	if type(r) == "table" then
 		if r.r then
 			r, g, b = r.r, r.g, r.b
@@ -78,45 +84,38 @@ local rgbtohex = function(r, g, b)
 			r, g, b = unpack(r)
 		end
 	end
-	return sformat("|cff%02x%02x%02x", r*255, g*255, b*255)
+	return ('|cff%02x%02x%02x'):format(r*255, g*255, b*255)
 end
 
 -- ------------------------------------------------------------------------
--- name update
+-- custom tags
 -- ------------------------------------------------------------------------
 oUF.Tags['[name]'] = function(u, r)
 	return UnitName(r or u):lower() or ''
 end
 
--- ------------------------------------------------------------------------
--- level update
--- ------------------------------------------------------------------------
-local GetDifficultyColor = function(level)
-	local levelDiff = UnitLevel('target') - UnitLevel('player')
-
-	if level == '??' then
-		return	.69,.31,.31
-	elseif levelDiff >= 5 then
-		return .69,.31,.31
-	elseif levelDiff >= 3 then
-		return .71,.43,.27
-	elseif levelDiff >= -2 then
-		return .84,.75,.65
-	elseif -levelDiff <= GetQuestGreenRange() then
-		return .33,.59,.33
+oUF.Tags['[diffcolor]']  = function(unit)
+	local r, g, b
+	local level = UnitLevel(unit)
+	if level < 1 then
+		r, g, b = .69,.31,.31
 	else
-		return	.55,.57,.61
+		local diffcolor = UnitLevel('target') - UnitLevel('player')
+		if diffcolor >= 5 then
+			r, g, b = .69,.31,.31
+		elseif diffcolor >= 3 then
+			r, g, b = .71,.43,.27
+		elseif diffcolor >= -2 then
+			r, g, b = .84,.75,.65
+		elseif -diffcolor <= GetQuestGreenRange() then
+			r, g, b = .33,.59,.33
+		else
+			r, g, b = .55,.57,.61
+		end
 	end
+	return RGBToHexh(r, g, b)
 end
-
-oUF.Tags['[targetlevel]'] = function(u)
-	local l = not UnitIsConnected(u) and '??' or UnitLevel(u) < 1 and '??' or UnitLevel(u)
-	local c = UnitClassification(u)
-	local r,g,b = GetDifficultyColor(level)
-	local rs = c == "rare" and l.."R" or c == "eliterare" and l.."R+" or c == "elite" and l.."+" or c == "worldboss" and l.."B" or l
-	return string.format("|cff%02x%02x%02x"..rs.. "|r", r*255, g*255, b*255)
-end
-oUF.TagEvents["[targetlevel]"] = "UNIT_LEVEL PLAYER_LEVEL_UP"
+oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
 -- ------------------------------------------------------------------------
 -- health update
@@ -132,7 +131,7 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 		bar.value:SetText("Offline")
 	elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
-			bar.value:SetText("|cff33EE44"..truncate(min) .."|r.".. floor(min/max*100).."%")
+			bar.value:SetText("|cff33EE44"..ShortValue(min) .."|r.".. floor(min/max*100).."%")
 		else
 			bar.value:SetText()
 		end
@@ -155,9 +154,9 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 		if(min==max or (ptype==6 and min == 0)) then
 			bar.value:SetText()
 		elseif(ptype==1 or ptype==3 or ptype==6 or ptype==2) then
-			bar.value:SetText(rgbtohex(color)..truncate(min).."|r")
+			bar.value:SetText(RGBToHexh(color)..ShortValue(min).."|r")
 		else
-			bar.value:SetText(rgbtohex(color)..truncate(min).."|r.".. floor(min/max*100).."%")
+			bar.value:SetText(RGBToHexh(color)..ShortValue(min).."|r.".. floor(min/max*100).."%")
 		end
 	end
 end
@@ -170,8 +169,8 @@ local PostCreateAuraIcon = function(self, button, icons)
 
 	local icon = button.icon
 	icon:SetTexCoord(.07, .93, .07, .93)
-	icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
-	icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
+	--icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
+	--icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
 
 	local overlay = button.overlay
 	overlay:SetTexture(bufftex)
@@ -180,8 +179,8 @@ local PostCreateAuraIcon = function(self, button, icons)
 
 	local cd = button.cd
 	cd:SetReverse()
-	cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-	cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+	--cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
+	--cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
 end
 
 -- ------------------------------------------------------------------------
@@ -433,13 +432,14 @@ local SetStyle = function(self, unit)
 		--
 		-- level
 		--
-		self.Level = self.Health:CreateFontString(nil, "OVERLAY")
-		self.Level:SetPoint("LEFT", self.Health, 0, 9)
-		self.Level:SetJustifyH("LEFT")
-		self.Level:SetFont(font, fontsize, "OUTLINE")
-		self.Level:SetTextColor(1,1,1)
-		self.Level:SetShadowOffset(1, -1)
-		self:Tag(self.Level, '[targetlevel]')
+		self.Info = self.Health:CreateFontString(nil, "OVERLAY")
+		self.Info:SetPoint("LEFT", self.Health, 0, 9)
+		self.Info:SetJustifyH("LEFT")
+		self.Info:SetFont(font, fontsize, "OUTLINE")
+		self.Info:SetTextColor(1,1,1)
+		self.Info:SetShadowOffset(1, -1)
+		--self:Tag(self.Info, '[targetlevel]')
+		self:Tag(self.Info, '[diffcolor][level][shortclassification]')
 
 		self:SetWidth(250)
 		self:SetHeight(20)
@@ -447,7 +447,7 @@ local SetStyle = function(self, unit)
 		self.Power:SetHeight(3)
 		self.Power.value:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-		self.Name:SetPoint("LEFT", self.Level, "RIGHT", 0, 0)
+		self.Name:SetPoint("LEFT", self.Info, "RIGHT", 0, 0)
 		self.Name:SetHeight(20)
 		self.Name:SetWidth(150)
 
@@ -507,6 +507,10 @@ local SetStyle = function(self, unit)
 		-- custom aura textures
 		--
 		self.PostCreateAuraIcon = PostCreateAuraIcon
+		
+		if(IsAddOnLoaded('oUF_BarFader')) then
+			self.BarFade = false
+		end
 	end
 
 	-- ------------------------------------
