@@ -12,6 +12,8 @@
 
 --]]
 
+local print = function(a) ChatFrame1:AddMessage("|cff33ff99oUF:|r "..tostring(a)) end
+
 -- ------------------------------------------------------------------------
 -- local horror
 -- ------------------------------------------------------------------------
@@ -164,11 +166,10 @@ end
 -- ------------------------------------------------------------------------
 -- aura reskin
 -- ------------------------------------------------------------------------
-local PostCreateAuraIcon = function(self, button, icons)
+local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	icons.showDebuffType = true
 
-	local icon = button.icon
-	icon:SetTexCoord(.07, .93, .07, .93)
+	button.icon:SetTexCoord(.07, .93, .07, .93)
 	--icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
 	--icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
 
@@ -177,29 +178,63 @@ local PostCreateAuraIcon = function(self, button, icons)
 	overlay:SetTexCoord(0,1,0,1)
 	overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
 
-	local cd = button.cd
-	cd:SetReverse()
+	button.cd:SetReverse()
 	--cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
 	--cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+	if (not debuff and self.unit == 'player') then
+		button:SetScript('OnMouseUp', function(self, mouseButton)
+			if mouseButton == 'RightButton' then
+				CancelUnitBuff('player', self:GetID())
+			end
+		end)
+	end
+end
+
+local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
+	icon.timeLeft = select(7,UnitAura(unit, index, filter))
 end
 
 -- ------------------------------------------------------------------------
 -- aura sorting
 -- ------------------------------------------------------------------------
-local sortunit
-local sortIcons = function(a, b)
-	local aet = select(7, UnitAura(sortunit, a:GetID(), a.filter)) or -1
-	local bet = select(7, UnitAura(sortunit, b:GetID(), b.filter)) or -1
+local incs = { 23, 10, 4, 1 }
+local function shellsort(t, n, before)
+	for _, h in ipairs(incs) do
+		for i = h + 1, n do
+			local v = t[i]
+			for j = i - h, 1, -h do
+				local testval = t[j]
+				if not before(v, testval) then break end
+				t[i] = testval
+				i = j
+			end
+			t[i] = v
+		end 
+    end
+end
 
-	return aet > bet
+local sortTarget = function(a, b)
+	return a.timeLeft > b.timeLeft
+end
+
+local sortPlayer = function(a, b)
+	if(a.timeLeft == 0) then
+		return true
+	elseif(b.timeLeft == 0) then
+		return false
+	else
+		return a.timeLeft > b.timeLeft
+	end
 end
 
 local SetAuraPosition = function(self, icons, x)
 	if(icons and x > 0) then
-		if( icons.visibleDebuffs ) then
-			sortunit = self.unit
-			sort(icons, sortIcons)
+		if(icons.visibleDebuffs and self.unit == 'target') then
+			shellsort(icons, #icons, sortTarget)
+		elseif(self.unit == 'player') then
+			shellsort(icons, #icons, sortPlayer)
 		end
+
 
 		local col = 0
 		local row = 0
@@ -353,13 +388,6 @@ local SetStyle = function(self, unit)
 	self.Leader:SetWidth(12)
 	self.Leader:SetPoint("BOTTOMRIGHT", self, -2, 4)
 
-	--
-	-- oUF_BarFader
-	--
-	if(IsAddOnLoaded('oUF_BarFader')) then
-		self.BarFade = true
-	end
-
 	-- ------------------------------------
 	-- player
 	-- ------------------------------------
@@ -373,6 +401,50 @@ local SetStyle = function(self, unit)
 		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
+
+		BuffFrame:Hide()
+		TemporaryEnchantFrame:Hide()
+
+		--
+		-- buffs
+		--
+		self.Buffs = CreateFrame("Frame", nil, self)
+		self.Buffs.size = 30
+		self.Buffs:SetHeight(self.Buffs.size)
+		self.Buffs:SetWidth(self.Buffs.size * 10)
+		self.Buffs:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', -170, -10)
+		self.Buffs.initialAnchor = "TOPRIGHT"
+		self.Buffs["growth-y"] = "DOWN"
+		self.Buffs["growth-x"] = "LEFT"
+		self.Buffs.filter = "HELPFUL"
+		self.Buffs.num = 40
+		self.Buffs.spacing = 4
+
+		--
+		-- debuffs
+		--
+		self.Debuffs = CreateFrame("Frame", nil, self)
+		self.Debuffs.size = 40
+		self.Debuffs:SetHeight(self.Debuffs.size)
+		self.Debuffs:SetWidth(self.Debuffs.size * 10)
+		self.Debuffs:SetPoint('TOPRIGHT', UIParent, 'TOPRIGHT', -170, -150)
+		self.Debuffs.initialAnchor = "TOPRIGHT"
+		self.Debuffs["growth-y"] = "DOWN"
+		self.Debuffs["growth-x"] = "LEFT"
+		self.Debuffs.filter = "HARMFUL"
+		self.Debuffs.num = 10
+		self.Debuffs.spacing = 4
+
+		--
+		-- Aura debuff sorting
+		--
+		self.SetAuraPosition = SetAuraPosition
+
+		--
+		-- custom aura textures
+		--
+		self.PostCreateAuraIcon = PostCreateAuraIcon
+		self.PostUpdateAuraIcon = PostUpdateAuraIcon
 	end
 
 	-- ------------------------------------
@@ -479,7 +551,7 @@ local SetStyle = function(self, unit)
 		self.Buffs:SetWidth(self.Buffs.size * 5)
 		self.Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -2, 15)
 		self.Buffs.initialAnchor = "BOTTOMLEFT"
-		self.Buffs["growth-y"] = "TOP"
+		self.Buffs["growth-y"] = "UP"
 		self.Buffs.filter = "HELPFUL"
 		self.Buffs.num = 40
 		self.Buffs.spacing = 2
@@ -493,7 +565,7 @@ local SetStyle = function(self, unit)
 		self.Debuffs:SetWidth(self.Debuffs.size * 5)
 		self.Debuffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -80)
 		self.Debuffs.initialAnchor = "TOPLEFT"
-		self.Debuffs["growth-y"] = "TOP"
+		self.Debuffs["growth-y"] = "UP"
 		self.Debuffs.filter = "HARMFUL|PLAYER"
 		self.Debuffs.num = 10
 		self.Debuffs.spacing = 2
@@ -507,10 +579,7 @@ local SetStyle = function(self, unit)
 		-- custom aura textures
 		--
 		self.PostCreateAuraIcon = PostCreateAuraIcon
-		
-		if(IsAddOnLoaded('oUF_BarFader')) then
-			self.BarFade = false
-		end
+		self.PostUpdateAuraIcon = PostUpdateAuraIcon
 	end
 
 	-- ------------------------------------
