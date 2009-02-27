@@ -191,6 +191,9 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 end
 
 local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
+	-- removes the cooldown spiral
+	icon.cd:SetAlpha(0)
+	
 	icon.timeLeft = select(7,UnitAura(unit, index, filter))
 end
 
@@ -270,6 +273,12 @@ local SetAuraPosition = function(self, icons, x)
 		end
 	end
 end
+
+-- ------------------------------------------------------------------------
+-- remove the blizz frames
+-- ------------------------------------------------------------------------
+BuffFrame:Hide()
+TemporaryEnchantFrame:Hide()
 
 -- ------------------------------------------------------------------------
 -- the layout starts here
@@ -386,7 +395,7 @@ local SetStyle = function(self, unit)
 	self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
 	self.Leader:SetHeight(12)
 	self.Leader:SetWidth(12)
-	self.Leader:SetPoint("BOTTOMRIGHT", self, -2, 4)
+	self.Leader:SetPoint("BOTTOMRIGHT", self, 5, -2)
 
 	-- ------------------------------------
 	-- player
@@ -401,9 +410,6 @@ local SetStyle = function(self, unit)
 		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
-
-		BuffFrame:Hide()
-		TemporaryEnchantFrame:Hide()
 
 		--
 		-- buffs
@@ -486,7 +492,7 @@ local SetStyle = function(self, unit)
 		--
 		self.CPoints = self:CreateFontString(nil, "OVERLAY")
 		self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
-		self.CPoints:SetFont(font, 38, "OUTLINE")
+		self.CPoints:SetFont(font, 45, "OUTLINE")
 		self.CPoints:SetTextColor(0, 0.81, 1)
 		self.CPoints:SetShadowOffset(1, -1)
 		self.CPoints:SetJustifyH("RIGHT")
@@ -501,17 +507,16 @@ local SetStyle = function(self, unit)
 	-- target
 	-- ------------------------------------
 	if(unit == "target") then
-		--
-		-- level
-		--
-		self.Info = self.Health:CreateFontString(nil, "OVERLAY")
-		self.Info:SetPoint("LEFT", self.Health, 0, 9)
-		self.Info:SetJustifyH("LEFT")
-		self.Info:SetFont(font, fontsize, "OUTLINE")
-		self.Info:SetTextColor(1,1,1)
-		self.Info:SetShadowOffset(1, -1)
-		--self:Tag(self.Info, '[targetlevel]')
-		self:Tag(self.Info, '[diffcolor][level][shortclassification]')
+	--
+	-- level
+	--
+	self.Info = self.Health:CreateFontString(nil, "OVERLAY")
+	self.Info:SetPoint("LEFT", self.Health, 0, 9)
+	self.Info:SetJustifyH("LEFT")
+	self.Info:SetFont(font, fontsize, "OUTLINE")
+	self.Info:SetTextColor(1,1,1)
+	self.Info:SetShadowOffset(1, -1)
+	self:Tag(self.Info, '[diffcolor][level][shortclassification]')
 
 		self:SetWidth(250)
 		self:SetHeight(20)
@@ -528,7 +533,7 @@ local SetStyle = function(self, unit)
 		--
 		self.CPoints = self:CreateFontString(nil, "OVERLAY")
 		self.CPoints:SetPoint("RIGHT", self, "LEFT", -10, 0)
-		self.CPoints:SetFont(font, 38, "OUTLINE")
+		self.CPoints:SetFont(font, 45, "OUTLINE")
 		self.CPoints:SetTextColor(0, 0.81, 1)
 		self.CPoints:SetShadowOffset(1, -1)
 		self.CPoints:SetJustifyH("RIGHT")
