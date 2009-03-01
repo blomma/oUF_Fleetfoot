@@ -568,7 +568,7 @@ local SetStyle = function(self, unit)
 		self.Debuffs.size = 35
 		self.Debuffs:SetHeight(self.Debuffs.size)
 		self.Debuffs:SetWidth(self.Debuffs.size * 5)
-		self.Debuffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -80)
+		self.Debuffs:SetPoint('CENTER', UIParent, 'CENTER', 0, -170)
 		self.Debuffs.initialAnchor = "TOPLEFT"
 		self.Debuffs["growth-y"] = "UP"
 		self.Debuffs.filter = "HARMFUL|PLAYER"
@@ -631,7 +631,7 @@ local SetStyle = function(self, unit)
 			self.Castbar.SafeZone:SetVertexColor(.75,.10,.10,.6)
 			self.Castbar.SafeZone:SetPoint("TOPRIGHT")
 			self.Castbar.SafeZone:SetPoint("BOTTOMRIGHT")
-			self.Castbar:SetPoint('CENTER', UIParent, 'CENTER', 0, -230)
+			self.Castbar:SetPoint('CENTER', UIParent, 'CENTER', 0, -255)
 		else
 			self.Castbar:SetStatusBarColor(0.80, 0.01, 0)
 			self.Castbar:SetHeight(20)
@@ -743,8 +743,8 @@ end
 oUF:RegisterStyle("Fleetfoot", SetStyle)
 oUF:SetActiveStyle("Fleetfoot")
 
-oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -106)
-oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -106)
+oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -206)
+oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -206)
 oUF:Spawn("pet", "oUF_Pet"):SetPoint("BOTTOMLEFT", oUF.units.player, 0, -30)
 oUF:Spawn("targettarget", "oUF_TargetTarget"):SetPoint("TOPRIGHT", oUF.units.target, 0, 35)
 oUF:Spawn("focus", "oUF_Focus"):SetPoint("BOTTOMRIGHT", oUF.units.player, 0, -30)
