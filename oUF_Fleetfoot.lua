@@ -6,9 +6,6 @@
 	Mail:		blomma@gmail.com
 
 	Credits:	oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
-				oUF_TsoHG (used as base) / http://www.wowinterface.com/downloads/info8739-oUF_TsoHG.html
-				Rothar for buff border (and Neal for the edited version)
-				p3lim for party toggle function
 
 --]]
 
@@ -78,7 +75,7 @@ end
 -- ------------------------------------------------------------------------
 -- returns the hex code of a rgb value
 -- ------------------------------------------------------------------------
-local RGBToHexh = function(r, g, b)
+local RGBToHex = function(r, g, b)
 	if type(r) == "table" then
 		if r.r then
 			r, g, b = r.r, r.g, r.b
@@ -115,7 +112,7 @@ oUF.Tags['[diffcolor]']  = function(unit)
 			r, g, b = .55,.57,.61
 		end
 	end
-	return RGBToHexh(r, g, b)
+	return RGBToHex(r, g, b)
 end
 oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
@@ -156,9 +153,9 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 		if(min==max or (ptype==6 and min == 0)) then
 			bar.value:SetText()
 		elseif(ptype==1 or ptype==3 or ptype==6 or ptype==2) then
-			bar.value:SetText(RGBToHexh(color)..ShortValue(min).."|r")
+			bar.value:SetText(RGBToHex(color)..ShortValue(min).."|r")
 		else
-			bar.value:SetText(RGBToHexh(color)..ShortValue(min).."|r.".. floor(min/max*100).."%")
+			bar.value:SetText(RGBToHex(color)..ShortValue(min).."|r.".. floor(min/max*100).."%")
 		end
 	end
 end
