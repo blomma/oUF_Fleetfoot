@@ -262,6 +262,8 @@ local SetAuraPosition = function(self, icons, x)
 					col = 0
 					row = row + 1
 				end
+
+				button:SetID(i)
 				button:ClearAllPoints()
 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
 
