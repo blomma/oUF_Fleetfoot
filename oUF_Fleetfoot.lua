@@ -167,8 +167,6 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	icons.showDebuffType = true
 
 	button.icon:SetTexCoord(.07, .93, .07, .93)
-	--icon:SetPoint("TOPLEFT", button, "TOPLEFT", 1, -1)
-	--icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -1, 1)
 
 	local overlay = button.overlay
 	overlay:SetTexture(bufftex)
@@ -176,8 +174,6 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
 
 	button.cd:SetReverse()
-	--cd:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-	--cd:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
 	if (not debuff and self.unit == 'player') then
 		button:SetScript('OnMouseUp', function(self, mouseButton)
 			if mouseButton == 'RightButton' then
