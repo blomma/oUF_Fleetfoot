@@ -365,7 +365,6 @@ local SetStyle = function(self, unit)
 	self.Power.value:SetFont(font, fontsize, "OUTLINE")
 	self.Power.value:SetTextColor(1,1,1)
 	self.Power.value:SetShadowOffset(1, -1)
-	self.Power.value:Hide()
 
 	--
 	-- powerbar functions
@@ -400,13 +399,13 @@ local SetStyle = function(self, unit)
 	-- player
 	-- ------------------------------------
 	if(unit == "player") then
+		self.Name:Hide()
+		
 		self:SetWidth(250)
 		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
-		self.Name:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
 		self.Power:SetHeight(3)
-		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 
@@ -456,13 +455,13 @@ local SetStyle = function(self, unit)
 	-- pet
 	-- ------------------------------------
 	if(unit == "pet") then
+		self.Name:Hide()
+
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(15.5)
-		self.Name:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
 		self.Power:SetHeight(3)
-		self.Power.value:Show()
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 
@@ -506,22 +505,23 @@ local SetStyle = function(self, unit)
 	-- target
 	-- ------------------------------------
 	if(unit == "target") then
-	--
-	-- level
-	--
-	self.Info = self.Health:CreateFontString(nil, "OVERLAY")
-	self.Info:SetPoint("LEFT", self.Health, 0, 9)
-	self.Info:SetJustifyH("LEFT")
-	self.Info:SetFont(font, fontsize, "OUTLINE")
-	self.Info:SetTextColor(1,1,1)
-	self.Info:SetShadowOffset(1, -1)
-	self:Tag(self.Info, '[diffcolor][level][shortclassification]')
+		self.Power.value:Hide()
+
+		--
+		-- level
+		--
+		self.Info = self.Health:CreateFontString(nil, "OVERLAY")
+		self.Info:SetPoint("LEFT", self.Health, 0, 9)
+		self.Info:SetJustifyH("LEFT")
+		self.Info:SetFont(font, fontsize, "OUTLINE")
+		self.Info:SetTextColor(1,1,1)
+		self.Info:SetShadowOffset(1, -1)
+		self:Tag(self.Info, '[diffcolor][level][shortclassification]')
 
 		self:SetWidth(250)
 		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
 		self.Power:SetHeight(3)
-		self.Power.value:Hide()
 		self.Health.value:SetPoint("RIGHT", 0, 9)
 		self.Name:SetPoint("LEFT", self.Info, "RIGHT", 0, 0)
 		self.Name:SetHeight(20)
@@ -590,12 +590,12 @@ local SetStyle = function(self, unit)
 	-- target of target and focus
 	-- ------------------------------------
 	if(unit == "targettarget" or unit == "focus") then
+		self.Power:Hide()
+		self.Health.value:Hide()
+
 		self:SetWidth(120)
 		self:SetHeight(18)
 		self.Health:SetHeight(18)
-		self.Power:Hide()
-		self.Power.value:Hide()
-		self.Health.value:Hide()
 		self.Name:SetWidth(95)
 		self.Name:SetHeight(18)
 		self.Name:SetTextColor(0.9, 0.5, 0.2)
@@ -693,27 +693,42 @@ local SetStyle = function(self, unit)
 	-- party
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Party")) then
-		self:SetWidth(160)
-		self:SetHeight(20)
-		self.Health:SetHeight(15)
-		self.Power:SetHeight(3)
+		self.Health.value:Hide()
 		self.Power.value:Hide()
-		self.Health.value:SetPoint("RIGHT", 0 , 9)
-		self.Name:SetPoint("LEFT", 0, 9)
+
+		self:SetWidth(50)
+		self:SetHeight(15)
+		self.Health:SetHeight(13)
+		-- self.Health:SetFrameLevel(2)
+		-- self.Power:SetFrameLevel(2)
+		self.Power:SetHeight(2)
+		self.Name:SetFont(font, 9, "OUTLINE")
+		self.Name:SetWidth(50)
+		self.Name:SetHeight(15)
+
+		-- self.Power.value:Hide()
+		-- 
+		-- self:SetWidth(160)
+		-- self:SetHeight(20)
+		-- self.Health:SetHeight(15)
+		-- self.Power:SetHeight(3)
+		-- self.Health.value:SetPoint("RIGHT", 0 , 9)
+		-- self.Name:SetPoint("LEFT", 0, 9)
 	end
 
 	-- ------------------------------------
 	-- raid
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Raid")) then
+		self.Health.value:Hide()
+		self.Power.value:Hide()
+
 		self:SetWidth(50)
 		self:SetHeight(15)
 		self.Health:SetHeight(13)
+		-- self.Health:SetFrameLevel(2)
+		-- self.Power:SetFrameLevel(2)
 		self.Power:SetHeight(2)
-		self.Health:SetFrameLevel(2)
-		self.Power:SetFrameLevel(2)
-		self.Health.value:Hide()
-		self.Power.value:Hide()
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
@@ -721,13 +736,16 @@ local SetStyle = function(self, unit)
 
 	self.disallowVehicleSwap = true
 
-	if(self:GetParent():GetName():match("oUF_Party")) then
-		self:SetAttribute('initial-height', 20)
-		self:SetAttribute('initial-width', 160)
-	else
-		self:SetAttribute('initial-height', height)
-		self:SetAttribute('initial-width', width)
-	end
+	self:SetAttribute('initial-height', height)
+	self:SetAttribute('initial-width', width)
+
+	-- if(self:GetParent():GetName():match("oUF_Party")) then
+	-- 	self:SetAttribute('initial-height', 20)
+	-- 	self:SetAttribute('initial-width', 160)
+	-- else
+	-- 	self:SetAttribute('initial-height', height)
+	-- 	self:SetAttribute('initial-width', width)
+	-- end
 
 	return self
 end
