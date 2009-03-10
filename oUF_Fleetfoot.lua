@@ -194,8 +194,10 @@ end
 -- aura sorting
 -- ------------------------------------------------------------------------
 local incs = { 23, 10, 4, 1 }
+local incsCount = #incs
 local function shellsort(t, n, before)
-	for _, h in ipairs(incs) do
+	for ii=1,incsCount do
+		local h = incs[ii]
 		for i = h + 1, n do
 			local v = t[i]
 			for j = i - h, 1, -h do
@@ -259,7 +261,7 @@ local SetAuraPosition = function(self, icons, x)
 					row = row + 1
 				end
 
-				button:SetID(i)
+				--button:SetID(i)
 				button:ClearAllPoints()
 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
 
@@ -273,7 +275,7 @@ end
 -- remove the blizz frames
 -- ------------------------------------------------------------------------
 BuffFrame:Hide()
-TemporaryEnchantFrame:Hide()
+--TemporaryEnchantFrame:Hide()
 
 -- ------------------------------------------------------------------------
 -- the layout starts here
