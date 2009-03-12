@@ -229,8 +229,6 @@ local SetAuraPosition = function(self, icons, x)
 	if(icons and x > 0) then
 		if(icons.visibleDebuffs and self.unit == 'target') then
 			shellsort(icons, #icons, sortTarget)
-		elseif(self.unit == 'player') then
-			shellsort(icons, #icons, sortPlayer)
 		end
 
 
@@ -261,7 +259,7 @@ local SetAuraPosition = function(self, icons, x)
 					row = row + 1
 				end
 
-				--button:SetID(i)
+				button:SetID(i)
 				button:ClearAllPoints()
 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
 
