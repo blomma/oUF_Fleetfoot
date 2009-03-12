@@ -73,20 +73,6 @@ local ShortValue = function(value)
 end
 
 -- ------------------------------------------------------------------------
--- returns the hex code of a rgb value
--- ------------------------------------------------------------------------
-local RGBToHex = function(r, g, b)
-	if type(r) == "table" then
-		if r.r then
-			r, g, b = r.r, r.g, r.b
-		else
-			r, g, b = unpack(r)
-		end
-	end
-	return ('|cff%02x%02x%02x'):format(r*255, g*255, b*255)
-end
-
--- ------------------------------------------------------------------------
 -- custom tags
 -- ------------------------------------------------------------------------
 oUF.Tags['[name]'] = function(u, r)
@@ -112,7 +98,7 @@ oUF.Tags['[diffcolor]']  = function(unit)
 			r, g, b = .55,.57,.61
 		end
 	end
-	return RGBToHex(r, g, b)
+	return ('|cff%02x%02x%02x'):format(r*255, g*255, b*255)
 end
 oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
@@ -130,7 +116,7 @@ local PostUpdateHealth = function(self, event, unit, bar, min, max)
 		bar.value:SetText("Offline")
 	elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
 		if(min ~= max) then
-			bar.value:SetText("|cff33EE44"..ShortValue(min) .."|r.".. floor(min/max*100).."%")
+			bar.value:SetFormattedText('|cff33EE44%s|r.%d%%', ShortValue(min), floor(min/max*100))
 		else
 			bar.value:SetText()
 		end
@@ -144,18 +130,18 @@ end
 -- ------------------------------------------------------------------------
 local PostUpdatePower = function(self, event, unit, bar, min, max)
 	local ptype, ptypestr = UnitPowerType(unit)
-	local color = oUF.colors.power[ptypestr]
 	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
 		bar:SetValue(0)
 	elseif(not UnitIsConnected(unit)) then
 		bar.value:SetText()
 	elseif(unit=="player" or unit=="pet") then
+		local r,g,b = unpack(oUF.colors.power[ptypestr])
 		if(min==max or (ptype==6 and min == 0)) then
 			bar.value:SetText()
 		elseif(ptype==1 or ptype==3 or ptype==6 or ptype==2) then
-			bar.value:SetText(RGBToHex(color)..ShortValue(min).."|r")
+			bar.value:SetFormattedText('|cff%02x%02x%02x%s|r', r * 255, g * 255, b * 255, ShortValue(min))
 		else
-			bar.value:SetText(RGBToHex(color)..ShortValue(min).."|r.".. floor(min/max*100).."%")
+			bar.value:SetFormattedText('|cff%02x%02x%02x%s|r.%d%%', r * 255, g * 255, b * 255, ShortValue(min), floor(min/max*100))
 		end
 	end
 end
@@ -259,7 +245,7 @@ local SetAuraPosition = function(self, icons, x)
 					row = row + 1
 				end
 
-				button:SetID(i)
+				--button:SetID(i)
 				button:ClearAllPoints()
 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
 
@@ -331,7 +317,7 @@ local SetStyle = function(self, unit)
 	self.Health.colorDisconnected = true
 	self.Health.colorClass = true
 	self.Health.colorReaction = true
-	self.Health.frequentUpdates = true
+	self.Health.frequentUpdates = 0.1
 	self.PostUpdateHealth = PostUpdateHealth
 
 	--
@@ -343,7 +329,7 @@ local SetStyle = function(self, unit)
 	self.Power:SetParent(self)
 	self.Power:SetPoint"LEFT"
 	self.Power:SetPoint"RIGHT"
-	self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -1.45) -- Little offset to make it pretty
+	self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -1.45)
 
 	--
 	-- powerbar background
@@ -369,7 +355,6 @@ local SetStyle = function(self, unit)
 	self.Power.colorDisconnected = true
 	self.Power.colorClass = true
 	self.Power.colorPower = true
-	self.Power.frequentUpdates = true
 	self.PostUpdatePower = PostUpdatePower
 
 	--
@@ -404,6 +389,7 @@ local SetStyle = function(self, unit)
 		self.Power:SetHeight(3)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
+		self.Power.frequentUpdates = 0.1
 
 		--
 		-- buffs
@@ -460,6 +446,7 @@ local SetStyle = function(self, unit)
 		self.Power:SetHeight(3)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
+		self.Power.frequentUpdates = 0.1
 
 		if(playerClass == "HUNTER") then
 			self.Health.colorReaction = false
