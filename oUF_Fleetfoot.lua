@@ -109,20 +109,25 @@ oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 local PostUpdateHealth = function(self, event, unit, bar, min, max)
 	if(UnitIsDead(unit)) then
 		bar:SetValue(0)
-		bar.value:SetText("Dead")
+		if bar.value then
+			bar.value:SetText("Dead")
+		end
 	elseif(UnitIsGhost(unit)) then
 		bar:SetValue(0)
-		bar.value:SetText("Ghost")
+		if bar.value then
+			bar.value:SetText("Ghost")
+		end
 	elseif(not UnitIsConnected(unit)) then
-		bar.value:SetText("Offline")
-	elseif(unit == "player" or unit=="target" or unit=="pet" or unit == "targettarget") then
+		bar:SetValue(0)
+		if bar.value then
+			bar.value:SetText("Offline")
+		end
+	elseif(unit == "player" or unit=="target" or unit=="pet") then
 		if(min ~= max) then
 			bar.value:SetFormattedText('|cff33EE44%s|r.%d%%', ShortValue(min), floor(min/max*100))
 		else
 			bar.value:SetText()
 		end
-	else
-		bar.value:SetText()
 	end
 end
 
@@ -312,12 +317,16 @@ local SetStyle = function(self, unit)
 	--
 	-- healthbar text
 	--
-	self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
-	self.Health.value:SetPoint("RIGHT", -2, 2)
-	self.Health.value:SetFont(font, fontsize, "OUTLINE")
-	self.Health.value:SetTextColor(1,1,1)
-	self.Health.value:SetShadowOffset(1, -1)
-
+	if not self:GetParent():GetName():match("oUF_Party") and 
+			not self:GetParent():GetName():match("oUF_Raid") and
+			unit ~= 'targettarget' and
+			unit ~= 'focus' then
+		self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
+		self.Health.value:SetPoint("RIGHT", -2, 2)
+		self.Health.value:SetFont(font, fontsize, "OUTLINE")
+		self.Health.value:SetTextColor(1,1,1)
+		self.Health.value:SetShadowOffset(1, -1)
+	end
 	--
 	-- healthbar functions
 	--
@@ -349,12 +358,13 @@ local SetStyle = function(self, unit)
 	--
 	-- powerbar text
 	--
-	self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
-	self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5)
-	self.Power.value:SetFont(font, fontsize, "OUTLINE")
-	self.Power.value:SetTextColor(1,1,1)
-	self.Power.value:SetShadowOffset(1, -1)
-
+	if unit ~= 'target' and not self:GetParent():GetName():match("oUF_Party") and not self:GetParent():GetName():match("oUF_Raid") then
+		self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
+		self.Power.value:SetPoint("RIGHT", self.Health.value, "BOTTOMRIGHT", 0, -5)
+		self.Power.value:SetFont(font, fontsize, "OUTLINE")
+		self.Power.value:SetTextColor(1,1,1)
+		self.Power.value:SetShadowOffset(1, -1)
+	end
 	--
 	-- powerbar functions
 	--
@@ -495,8 +505,6 @@ local SetStyle = function(self, unit)
 	-- target
 	-- ------------------------------------
 	if(unit == "target") then
-		self.Power.value:Hide()
-
 		self:SetWidth(250)
 		self:SetHeight(46)
 
@@ -584,7 +592,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	if(unit == "targettarget" or unit == "focus") then
 		self.Power:Hide()
-		self.Health.value:Hide()
+		--self.Health.value:Hide()
 
 		self:SetWidth(120)
 		self:SetHeight(18)
@@ -704,8 +712,7 @@ local SetStyle = function(self, unit)
 	-- party
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Party")) then
-		self.Health.value:Hide()
-		self.Power.value:Hide()
+		--self.Health.value:Hide()
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
@@ -721,8 +728,7 @@ local SetStyle = function(self, unit)
 	-- raid
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Raid")) then
-		self.Health.value:Hide()
-		self.Power.value:Hide()
+		--self.Health.value:Hide()
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
