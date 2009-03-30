@@ -161,9 +161,9 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
 
 	button.cd:SetReverse()
-	if (not debuff and self.unit == 'player') then
+	if (self.unit == 'player') then
 		button:SetScript('OnMouseUp', function(self, mouseButton)
-			if mouseButton == 'RightButton' then
+			if mouseButton == 'RightButton' and not self.debuff then
 				CancelUnitBuff('player', self:GetID())
 			end
 		end)
