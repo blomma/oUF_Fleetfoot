@@ -297,7 +297,6 @@ local SetStyle = function(self, unit)
 	-- healthbar
 	--
 	self.Health = CreateFrame("StatusBar", nil, self)
-	--self.Health:SetHeight(19)
 	self.Health:SetStatusBarTexture(bartex)
 	self.Health:SetPoint("TOP")
 	self.Health:SetPoint("LEFT")
@@ -368,14 +367,15 @@ local SetStyle = function(self, unit)
 	--
 	-- names
 	--
-	self.Name = self.Health:CreateFontString(nil, "OVERLAY")
-	self.Name:SetPoint("LEFT", self, 0, 9)
-	self.Name:SetJustifyH"LEFT"
-	self.Name:SetFont(font, fontsize, "OUTLINE")
-	self.Name:SetShadowOffset(1, -1)
-	self.Name:SetTextColor(1,1,1)
-	self:Tag(self.Name, '[name]')
-
+	if unit ~= 'player' and unit ~= 'pet' then
+		self.Name = self.Health:CreateFontString(nil, "OVERLAY")
+		self.Name:SetPoint("LEFT", self, 0, 9)
+		self.Name:SetJustifyH("LEFT")
+		self.Name:SetFont(font, fontsize, "OUTLINE")
+		self.Name:SetShadowOffset(1, -1)
+		self.Name:SetTextColor(1,1,1)
+		self:Tag(self.Name, '[name]')
+	end
 	--
 	-- leader icon
 	--
@@ -388,12 +388,12 @@ local SetStyle = function(self, unit)
 	-- player
 	-- ------------------------------------
 	if(unit == "player") then
-		self.Name:Hide()
-		
 		self:SetWidth(250)
 		self:SetHeight(46)
+
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
+	
 		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
@@ -445,12 +445,12 @@ local SetStyle = function(self, unit)
 	-- pet
 	-- ------------------------------------
 	if(unit == "pet") then
-		self.Name:Hide()
-
 		self:SetWidth(120)
 		self:SetHeight(20)
+		
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
+		
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
@@ -499,8 +499,10 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(250)
 		self:SetHeight(46)
+		
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
+		
 		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
 
 		--
@@ -586,7 +588,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(120)
 		self:SetHeight(18)
+		
 		self.Health:SetHeight(18)
+		
 		self.Name:SetWidth(95)
 		self.Name:SetHeight(18)
 		self.Name:SetTextColor(0.9, 0.5, 0.2)
@@ -705,7 +709,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
+		
 		self.Health:SetHeight(13)
+		
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
@@ -720,7 +726,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
+		
 		self.Health:SetHeight(13)
+		
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
