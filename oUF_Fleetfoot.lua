@@ -20,6 +20,7 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsConnected = UnitIsConnected
 local UnitAura = UnitAura
 local UnitPowerType = UnitPowerType
+local string_format = string.format
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -64,9 +65,9 @@ end
 -- ------------------------------------------------------------------------
 local ShortValue = function(value)
 	if(value >= 1e6) then
-		return ('%dm'):format(value / 1e6)
+		return string_format('%dm', value / 1e6)
 	elseif(value >= 1e4) then
-		return ('%dk'):format(value / 1e3)
+		return string_format('%dk', value / 1e3)
 	else
 		return value
 	end
@@ -98,7 +99,7 @@ oUF.Tags['[diffcolor]']  = function(unit)
 			r, g, b = .55,.57,.61
 		end
 	end
-	return ('|cff%02x%02x%02x'):format(r*255, g*255, b*255)
+	return string_format('|cff%02x%02x%02x', r*255, g*255, b*255)
 end
 oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
@@ -259,7 +260,7 @@ end
 -- remove the blizz frames
 -- ------------------------------------------------------------------------
 BuffFrame:Hide()
---TemporaryEnchantFrame:Hide()
+TemporaryEnchantFrame:Hide()
 
 -- ------------------------------------------------------------------------
 -- the layout starts here
