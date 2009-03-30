@@ -171,10 +171,19 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 end
 
 local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
-	-- removes the cooldown spiral
 	icon.cd:SetAlpha(0)
 	
 	icon.timeLeft = select(7,UnitAura(unit, index, filter))
+end
+
+local HidePortrait = function(self, unit)
+	if (self.unit == 'target') then
+		if (not UnitExists(self.unit) or not UnitIsConnected(self.unit) or not UnitIsVisible(self.unit)) then
+			self.Portrait:SetAlpha(0)
+		else
+			self.Portrait:SetAlpha(1)
+		end
+	end
 end
 
 -- ------------------------------------------------------------------------
@@ -287,10 +296,9 @@ local SetStyle = function(self, unit)
 	--
 	-- healthbar
 	--
-	self.Health = CreateFrame("StatusBar")
-	self.Health:SetHeight(19)
+	self.Health = CreateFrame("StatusBar", nil, self)
+	--self.Health:SetHeight(19)
 	self.Health:SetStatusBarTexture(bartex)
-	self.Health:SetParent(self)
 	self.Health:SetPoint("TOP")
 	self.Health:SetPoint("LEFT")
 	self.Health:SetPoint("RIGHT")
@@ -324,13 +332,12 @@ local SetStyle = function(self, unit)
 	--
 	-- powerbar
 	--
-	self.Power = CreateFrame("StatusBar")
+	self.Power = CreateFrame("StatusBar", nil, self)
 	self.Power:SetHeight(3)
 	self.Power:SetStatusBarTexture(bartex)
-	self.Power:SetParent(self)
-	self.Power:SetPoint"LEFT"
-	self.Power:SetPoint"RIGHT"
-	self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -1.45)
+	self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -1.5)
+	self.Power:SetPoint("LEFT")
+	self.Power:SetPoint("RIGHT")
 
 	--
 	-- powerbar background
@@ -384,10 +391,10 @@ local SetStyle = function(self, unit)
 		self.Name:Hide()
 		
 		self:SetWidth(250)
-		self:SetHeight(20)
+		self:SetHeight(46)
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-		self.Power:SetHeight(3)
+		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
@@ -441,10 +448,9 @@ local SetStyle = function(self, unit)
 		self.Name:Hide()
 
 		self:SetWidth(120)
-		self:SetHeight(18)
+		self:SetHeight(20)
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-		self.Power:SetHeight(3)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
@@ -491,6 +497,12 @@ local SetStyle = function(self, unit)
 	if(unit == "target") then
 		self.Power.value:Hide()
 
+		self:SetWidth(250)
+		self:SetHeight(46)
+		self.Health:SetHeight(15.5)
+		self.Health.value:SetPoint("RIGHT", 0, 9)
+		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
+
 		--
 		-- level
 		--
@@ -502,11 +514,6 @@ local SetStyle = function(self, unit)
 		self.Info:SetShadowOffset(1, -1)
 		self:Tag(self.Info, '[diffcolor][level][shortclassification]')
 
-		self:SetWidth(250)
-		self:SetHeight(20)
-		self.Health:SetHeight(15.5)
-		self.Power:SetHeight(3)
-		self.Health.value:SetPoint("RIGHT", 0, 9)
 		self.Name:SetPoint("LEFT", self.Info, "RIGHT", 0, 0)
 		self.Name:SetHeight(20)
 		self.Name:SetWidth(150)
@@ -593,6 +600,22 @@ local SetStyle = function(self, unit)
 		self.RaidIcon:SetPoint("RIGHT", self, 0, 9)
 	end
 
+	-- ------------------------------------
+	-- player and target portrait
+	-- ------------------------------------
+	if(unit == 'player' or unit == 'target') then
+		self.Portrait = CreateFrame('PlayerModel', nil, self)
+		self.Portrait:SetFrameLevel(1)
+		self.Portrait:SetPoint('TOPLEFT', self.Health, 'BOTTOMLEFT', 0, -1.5)
+		self.Portrait:SetPoint('BOTTOMRIGHT', self.Power, 'TOPRIGHT', -0.5, 1.5)
+		table.insert(self.__elements, HidePortrait)
+
+		self.PortraitOverlay = CreateFrame('StatusBar', nil, self)
+		self.PortraitOverlay:SetFrameLevel(2)
+		self.PortraitOverlay:SetAllPoints(self.Portrait)
+		self.PortraitOverlay:SetStatusBarTexture(bartex)
+		self.PortraitOverlay:SetStatusBarColor(0.25, 0.25, 0.25, 0.2)
+	end
 	-- ------------------------------------
 	-- player and target castbar
 	-- ------------------------------------
@@ -681,23 +704,11 @@ local SetStyle = function(self, unit)
 		self.Power.value:Hide()
 
 		self:SetWidth(50)
-		self:SetHeight(15)
+		self:SetHeight(17.5)
 		self.Health:SetHeight(13)
-		-- self.Health:SetFrameLevel(2)
-		-- self.Power:SetFrameLevel(2)
-		self.Power:SetHeight(2)
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
-
-		-- self.Power.value:Hide()
-		-- 
-		-- self:SetWidth(160)
-		-- self:SetHeight(20)
-		-- self.Health:SetHeight(15)
-		-- self.Power:SetHeight(3)
-		-- self.Health.value:SetPoint("RIGHT", 0 , 9)
-		-- self.Name:SetPoint("LEFT", 0, 9)
 	end
 
 	-- ------------------------------------
@@ -708,11 +719,8 @@ local SetStyle = function(self, unit)
 		self.Power.value:Hide()
 
 		self:SetWidth(50)
-		self:SetHeight(15)
+		self:SetHeight(17.5)
 		self.Health:SetHeight(13)
-		-- self.Health:SetFrameLevel(2)
-		-- self.Power:SetFrameLevel(2)
-		self.Power:SetHeight(2)
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
