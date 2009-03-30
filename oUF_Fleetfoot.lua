@@ -172,7 +172,7 @@ end
 
 local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
 	icon.cd:SetAlpha(0)
-	
+
 	icon.timeLeft = select(7,UnitAura(unit, index, filter))
 end
 
@@ -203,7 +203,7 @@ local function shellsort(t, n, before)
 				i = j
 			end
 			t[i] = v
-		end 
+		end
     end
 end
 
@@ -393,7 +393,7 @@ local SetStyle = function(self, unit)
 
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-	
+
 		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
@@ -447,10 +447,10 @@ local SetStyle = function(self, unit)
 	if(unit == "pet") then
 		self:SetWidth(120)
 		self:SetHeight(20)
-		
+
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-		
+
 		self.Power.value:SetPoint("LEFT", self.Health, 0, 9)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
@@ -499,10 +499,10 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(250)
 		self:SetHeight(46)
-		
+
 		self.Health:SetHeight(15.5)
 		self.Health.value:SetPoint("RIGHT", 0, 9)
-		
+
 		self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, -27.5)
 
 		--
@@ -588,9 +588,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(120)
 		self:SetHeight(18)
-		
+
 		self.Health:SetHeight(18)
-		
+
 		self.Name:SetWidth(95)
 		self.Name:SetHeight(18)
 		self.Name:SetTextColor(0.9, 0.5, 0.2)
@@ -709,9 +709,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
-		
+
 		self.Health:SetHeight(13)
-		
+
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
@@ -726,9 +726,9 @@ local SetStyle = function(self, unit)
 
 		self:SetWidth(50)
 		self:SetHeight(17.5)
-		
+
 		self.Health:SetHeight(13)
-		
+
 		self.Name:SetFont(font, 9, "OUTLINE")
 		self.Name:SetWidth(50)
 		self.Name:SetHeight(15)
