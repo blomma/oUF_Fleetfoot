@@ -20,7 +20,9 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsConnected = UnitIsConnected
 local UnitAura = UnitAura
 local UnitPowerType = UnitPowerType
-local string_format = string.format
+local abs = math.abs
+local floor = math.floor
+local format = string.format
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -68,11 +70,26 @@ end
 -- ------------------------------------------------------------------------
 local ShortValue = function(value)
 	if(value >= 1e6) then
-		return string_format('%dm', value / 1e6)
+		return format('%dm', value / 1e6)
 	elseif(value >= 1e4) then
-		return string_format('%dk', value / 1e3)
+		return format('%dk', value / 1e3)
 	else
 		return value
+	end
+end
+
+local GetFormattedTime = function(s)
+	local day, hour, minute, tenseconds = 86400, 3600, 60, 10
+	if s >= day then
+		return format('%dd', floor(s/day + 0.5)), s % day
+	elseif s >= hour then
+		return format('%dh', floor(s/hour + 0.5)), s % hour
+	elseif s >= minute then
+		return format('%dm', floor(s/minute + 0.5)), s % minute
+	elseif s >= tenseconds then
+		return format('%d', floor(s + 0.5)), s - floor(s)
+	else
+		return format('%.1f', floor(s*10)/10), 0.1
 	end
 end
 
@@ -102,7 +119,7 @@ oUF.Tags['[diffcolor]']  = function(unit)
 			r, g, b = .55,.57,.61
 		end
 	end
-	return string_format('|cff%02x%02x%02x', r*255, g*255, b*255)
+	return format('|cff%02x%02x%02x', r*255, g*255, b*255)
 end
 oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
@@ -160,6 +177,20 @@ end
 -- ------------------------------------------------------------------------
 -- aura reskin
 -- ------------------------------------------------------------------------
+local CreateAuraTimer = function(self,elapsed)
+	self.elapsed = self.elapsed + elapsed
+	if self.elapsed >= 0.1 then
+		if self.timeLeft > 0 then
+			self.timeLeft = self.timeLeft - self.elapsed
+			self.remaining:SetText(GetFormattedTime(self.timeLeft))
+		else
+			self.remaining:Hide()
+			self:SetScript('OnUpdate', nil)
+		end
+		self.elapsed = 0
+	end
+end
+
 local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	icons.showDebuffType = true
 
@@ -170,7 +201,11 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	overlay:SetTexCoord(0,1,0,1)
 	overlay.Hide = function(self) self:SetVertexColor(0.3, 0.3, 0.3) end
 
-	button.cd:SetReverse()
+	local cd = button.cd
+	cd:SetReverse()
+	cd.noOCC = true
+	cd.noCooldownCount = true
+
 	if (self.unit == 'player') then
 		button:SetScript('OnMouseUp', function(self, mouseButton)
 			if mouseButton == 'RightButton' and not self.debuff then
@@ -178,12 +213,35 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 			end
 		end)
 	end
+
+	if icons ~= self.Enchant then
+		local remaining = button.cd:CreateFontString(nil, 'OVERLAY')
+		remaining:Hide()
+
+		remaining:SetFont(font, 12, 'OUTLINE')
+		remaining:SetTextColor(0.84, 0.75, 0.65)
+		remaining:SetJustifyH('LEFT')
+		remaining:SetShadowColor(0, 0, 0)
+		remaining:SetShadowOffset(1.25, -1.25)
+		remaining:SetPoint('TOPLEFT', 1.5, 3)
+		
+		button.remaining = remaining
+	end
 end
 
 local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
-	icon.cd:SetAlpha(0)
-
-	icon.timeLeft = select(7,UnitAura(unit, index, filter))
+	if icons ~= self.Enchant then
+		local _, _, _, _, _, _, timeLeft, _ = UnitAura(unit, index, filter)
+		if(timeLeft > 0) then
+			icon.timeLeft = timeLeft - GetTime()
+			icon.elapsed = 0
+			icon.remaining:Show()
+			icon:SetScript('OnUpdate', CreateAuraTimer)
+		else
+			icon.remaining:Hide()
+			icon:SetScript('OnUpdate', nil)
+		end
+	end
 end
 
 local HidePortrait = function(self, unit)
@@ -237,7 +295,6 @@ local SetAuraPosition = function(self, icons, x)
 			shellsort(icons, #icons, sortTarget)
 		end
 
-
 		local col = 0
 		local row = 0
 		local spacing = icons.spacing or 0
@@ -265,7 +322,6 @@ local SetAuraPosition = function(self, icons, x)
 					row = row + 1
 				end
 
-				--button:SetID(i)
 				button:ClearAllPoints()
 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
 
@@ -322,7 +378,7 @@ local SetStyle = function(self, unit)
 	--
 	-- healthbar text
 	--
-	if not self:GetParent():GetName():match("oUF_Party") and 
+	if not self:GetParent():GetName():match("oUF_Party") and
 			not self:GetParent():GetName():match("oUF_Raid") and
 			unit ~= 'targettarget' and
 			unit ~= 'focus' then
@@ -444,10 +500,22 @@ local SetStyle = function(self, unit)
 		self.Debuffs.num = 10
 		self.Debuffs.spacing = 4
 
+
 		--
-		-- Aura debuff sorting
+		-- enchants
 		--
-		self.SetAuraPosition = SetAuraPosition
+		if(IsAddOnLoaded('oUF_WeaponEnchant')) then
+			self.Enchant = CreateFrame('Frame', nil, self)
+			self.Enchant:SetHeight(20 * 2)
+			self.Enchant:SetWidth(20)
+			self.Enchant:SetPoint('TOPLEFT', self, 'TOPRIGHT', 5, 2)
+			self.Enchant.size = 20
+			self.Enchant.spacing = 1
+			self.Enchant.initialAnchor = 'TOPLEFT'
+			self.Enchant['growth-y'] = 'DOWN'
+		end
+
+		self.PostCreateEnchantIcon = PostCreateAuraIcon
 
 		--
 		-- custom aura textures
@@ -597,7 +665,6 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	if(unit == "targettarget" or unit == "focus") then
 		self.Power:Hide()
-		--self.Health.value:Hide()
 
 		self:SetWidth(120)
 		self:SetHeight(18)
@@ -749,15 +816,6 @@ local SetStyle = function(self, unit)
 
 	self:SetAttribute('initial-height', height)
 	self:SetAttribute('initial-width', width)
-
-	-- if(self:GetParent():GetName():match("oUF_Party")) then
-	-- 	self:SetAttribute('initial-height', 20)
-	-- 	self:SetAttribute('initial-width', 160)
-	-- else
-	-- 	self:SetAttribute('initial-height', height)
-	-- 	self:SetAttribute('initial-width', width)
-	-- end
-
 	return self
 end
 
