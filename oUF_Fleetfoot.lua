@@ -784,8 +784,6 @@ local SetStyle = function(self, unit)
 	-- party
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Party")) then
-		--self.Health.value:Hide()
-
 		self:SetWidth(50)
 		self:SetHeight(17.5)
 
@@ -800,8 +798,6 @@ local SetStyle = function(self, unit)
 	-- raid
 	-- ------------------------------------
 	if(self:GetParent():GetName():match("oUF_Raid")) then
-		--self.Health.value:Hide()
-
 		self:SetWidth(50)
 		self:SetHeight(17.5)
 
