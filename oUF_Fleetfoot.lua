@@ -25,11 +25,14 @@ local string_format = string.format
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
 -- ------------------------------------------------------------------------
-local font = "Interface\\AddOns\\oUF_Fleetfoot\\fonts\\font.ttf"
-local upperfont = "Interface\\AddOns\\oUF_Fleetfoot\\fonts\\upperfont.ttf"
+local font = [=[Interface\AddOns\oUF_Fleetfoot\fonts\font.ttf]=]
+local upperfont = [=[Interface\AddOns\oUF_Fleetfoot\fonts\upperfont.ttf]=]
 local fontsize = 15
-local bartex = "Interface\\AddOns\\oUF_Fleetfoot\\textures\\statusbar"
-local bufftex = "Interface\\AddOns\\oUF_Fleetfoot\\textures\\border"
+local bartex = [=[Interface\AddOns\oUF_Fleetfoot\textures\statusbar]=]
+local bufftex = [=[Interface\AddOns\oUF_Fleetfoot\textures\border]=]
+local normTex = [=[Interface\Addons\oUF_Fleetfoot\textures\normTex]=]
+local revTex = [=[Interface\Addons\oUF_Fleetfoot\textures\revTex]=]
+
 local playerClass = select(2, UnitClass("player"))
 
 -- ------------------------------------------------------------------------
@@ -139,7 +142,9 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
 		bar:SetValue(0)
 	elseif(not UnitIsConnected(unit)) then
-		bar.value:SetText()
+		if bar.value then
+			bar.value:SetText()
+		end
 	elseif(unit=="player" or unit=="pet") then
 		local r,g,b = unpack(oUF.colors.power[ptypestr])
 		if(min==max or (ptype==6 and min == 0)) then
@@ -625,8 +630,8 @@ local SetStyle = function(self, unit)
 		self.PortraitOverlay = CreateFrame('StatusBar', nil, self)
 		self.PortraitOverlay:SetFrameLevel(2)
 		self.PortraitOverlay:SetAllPoints(self.Portrait)
-		self.PortraitOverlay:SetStatusBarTexture(bartex)
-		self.PortraitOverlay:SetStatusBarColor(0.25, 0.25, 0.25, 0.2)
+		self.PortraitOverlay:SetStatusBarTexture(unit == 'player' and normTex or revTex)
+		self.PortraitOverlay:SetStatusBarColor(0.25, 0.25, 0.25, 0.5)
 	end
 	-- ------------------------------------
 	-- player and target castbar
