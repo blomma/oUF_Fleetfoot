@@ -6,6 +6,7 @@
 	Mail:		blomma@gmail.com
 
 	Credits:	oUF_Lyn (used as base) / http://www.wowinterface.com/downloads/info10326-oUF_Lyn.html
+				oUF_Caellian (inspiration and code) / http://www.wowinterface.com/downloads/info9974.html
 
 --]]
 
@@ -20,9 +21,9 @@ local UnitIsGhost = UnitIsGhost
 local UnitIsConnected = UnitIsConnected
 local UnitAura = UnitAura
 local UnitPowerType = UnitPowerType
-local abs = math.abs
 local floor = math.floor
 local format = string.format
+local GetTime = GetTime
 
 -- ------------------------------------------------------------------------
 -- font, fontsize and textures
@@ -38,7 +39,7 @@ local revTex = [=[Interface\Addons\oUF_Fleetfoot\textures\revTex]=]
 local playerClass = select(2, UnitClass("player"))
 
 -- ------------------------------------------------------------------------
--- change some colors :)
+-- change some colors
 -- ------------------------------------------------------------------------
 local colors = setmetatable({
 	happiness = setmetatable({
@@ -78,8 +79,8 @@ local ShortValue = function(value)
 	end
 end
 
+local day, hour, minute, tenseconds = 86400, 3600, 60, 10
 local GetFormattedTime = function(s)
-	local day, hour, minute, tenseconds = 86400, 3600, 60, 10
 	if s >= day then
 		return format('%dd', floor(s/day + 0.5)), s % day
 	elseif s >= hour then
@@ -175,18 +176,13 @@ local PostUpdatePower = function(self, event, unit, bar, min, max)
 end
 
 -- ------------------------------------------------------------------------
--- aura reskin
+-- aura
 -- ------------------------------------------------------------------------
-local CreateAuraTimer = function(self,elapsed)
+local UpdateAuraTimer = function(self,elapsed)
 	self.elapsed = self.elapsed + elapsed
 	if self.elapsed >= 0.1 then
-		if self.timeLeft > 0 then
-			self.timeLeft = self.timeLeft - self.elapsed
-			self.remaining:SetText(GetFormattedTime(self.timeLeft))
-		else
-			self.remaining:Hide()
-			self:SetScript('OnUpdate', nil)
-		end
+		self.timeLeft = self.timeLeft - self.elapsed
+		self.remaining:SetText(GetFormattedTime(self.timeLeft))
 		self.elapsed = 0
 	end
 end
@@ -236,7 +232,7 @@ local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filt
 			icon.timeLeft = timeLeft - GetTime()
 			icon.elapsed = 0
 			icon.remaining:Show()
-			icon:SetScript('OnUpdate', CreateAuraTimer)
+			icon:SetScript('OnUpdate', UpdateAuraTimer)
 		else
 			icon.remaining:Hide()
 			icon:SetScript('OnUpdate', nil)
