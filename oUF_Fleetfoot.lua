@@ -272,7 +272,13 @@ local function shellsort(t, n, before)
 end
 
 local sortTarget = function(a, b)
-	return a.timeLeft > b.timeLeft
+	if(a.timeLeft == nil) then
+		return true
+	elseif(b.timeLeft == nil) then
+		return false
+	else
+		return a.timeLeft > b.timeLeft
+	end
 end
 
 local sortPlayer = function(a, b)
