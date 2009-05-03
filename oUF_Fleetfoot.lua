@@ -36,17 +36,37 @@ local bufftex = [=[Interface\AddOns\oUF_Fleetfoot\textures\border]=]
 local normTex = [=[Interface\Addons\oUF_Fleetfoot\textures\normTex]=]
 local revTex = [=[Interface\Addons\oUF_Fleetfoot\textures\revTex]=]
 
-local playerClass = select(2, UnitClass("player"))
+local class = select(2, UnitClass("player"))
+
+local backdrop = {
+	bgFile = [=[Interface\ChatFrame\ChatFrameBackground]=], tile = true, tileSize = 16,
+	insets = {left = -2, right = -2, top = -2, bottom = -2},
+}
 
 -- ------------------------------------------------------------------------
 -- change some colors
 -- ------------------------------------------------------------------------
+local runeloadcolors = {
+	[1] = {0.69, 0.31, 0.31},
+	[2] = {0.69, 0.31, 0.31},
+	[3] = {0.33, 0.59, 0.33},
+	[4] = {0.33, 0.59, 0.33},
+	[5] = {0.31, 0.45, 0.63},
+	[6] = {0.31, 0.45, 0.63},
+}
+
 local colors = setmetatable({
 	happiness = setmetatable({
 		[1] = {182/225, 34/255, 32/255},	-- unhappy
 		[2] = {220/225, 180/225, 52/225},	-- content
 		[3] = {143/255, 194/255, 32/255},	-- happy
 	}, {__index = oUF.colors.happiness}),
+	runes = setmetatable({
+		[1] = {0.69, 0.31, 0.31},
+		[2] = {0.33, 0.59, 0.33},
+		[3] = {0.31, 0.45, 0.63},
+		[4] = {0.84, 0.75, 0.65},
+	}, {__index = oUF.colors.runes}),
 }, {__index = oUF.colors})
 
 -- ------------------------------------------------------------------------
@@ -355,10 +375,7 @@ local SetStyle = function(self, unit)
 	--
 	-- background
 	--
-	self:SetBackdrop{
-		bgFile = "Interface\\ChatFrame\\ChatFrameBackground", tile = true, tileSize = 16,
-		insets = {left = -2, right = -2, top = -2, bottom = -2},
-	}
+	self:SetBackdrop(backdrop)
 	self:SetBackdropColor(0,0,0,1)
 
 	--
@@ -455,7 +472,7 @@ local SetStyle = function(self, unit)
 	self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
 	self.Leader:SetHeight(12)
 	self.Leader:SetWidth(12)
-	self.Leader:SetPoint("BOTTOMRIGHT", self, 5, -2)
+	self.Leader:SetPoint("BOTTOMRIGHT", self, 5, -2)¯
 
 	-- ------------------------------------
 	-- player
@@ -506,7 +523,7 @@ local SetStyle = function(self, unit)
 		--
 		-- enchants
 		--
-		if(IsAddOnLoaded('oUF_WeaponEnchant')) then
+		if IsAddOnLoaded('oUF_WeaponEnchant') then
 			self.Enchant = CreateFrame('Frame', nil, self)
 			self.Enchant:SetHeight(20 * 2)
 			self.Enchant:SetWidth(20)
@@ -515,6 +532,30 @@ local SetStyle = function(self, unit)
 			self.Enchant.spacing = 1
 			self.Enchant.initialAnchor = 'TOPLEFT'
 			self.Enchant['growth-y'] = 'DOWN'
+		end
+
+		if IsAddOnLoaded('oUF_RuneBar') and class == 'DEATHKNIGHT' then
+			self.RuneBar = {}
+			for i = 1, 6 do
+				self.RuneBar[i] = CreateFrame('StatusBar', self:GetName()..'_RuneBar'..i, self)
+				self.RuneBar[i]:SetHeight(7)
+				self.RuneBar[i]:SetWidth(250/6 - 0.85)
+				if (i == 1) then
+					self.RuneBar[i]:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -2)
+				else
+					self.RuneBar[i]:SetPoint('TOPLEFT', self.RuneBar[i-1], 'TOPRIGHT', 1, 0)
+				end
+				self.RuneBar[i]:SetStatusBarTexture(bartex)
+				self.RuneBar[i]:SetStatusBarColor(unpack(runeloadcolors[i]))
+				self.RuneBar[i]:SetBackdrop(backdrop)
+				self.RuneBar[i]:SetBackdropColor(0, 0, 0)
+				self.RuneBar[i]:SetMinMaxValues(0, 1)
+
+				self.RuneBar[i].bg = self.RuneBar[i]:CreateTexture(nil, 'BORDER')
+				self.RuneBar[i].bg:SetAllPoints(self.RuneBar[i])
+				self.RuneBar[i].bg:SetTexture(bartex)
+				self.RuneBar[i].bg:SetVertexColor(0.15, 0.15, 0.15)
+			end
 		end
 
 		self.PostCreateEnchantIcon = PostCreateAuraIcon
@@ -540,7 +581,7 @@ local SetStyle = function(self, unit)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
 
-		if(playerClass == "HUNTER") then
+		if(class == "HUNTER") then
 			self.Health.colorReaction = false
 			self.Health.colorClass = false
 			self.Health.colorHappiness = true
@@ -653,7 +694,7 @@ local SetStyle = function(self, unit)
 		--
 		-- Aura debuff sorting
 		--
-		self.SetAuraPosition = SetAuraPosition
+		--self.SetAuraPosition = SetAuraPosition
 
 		--
 		-- custom aura textures
@@ -714,9 +755,7 @@ local SetStyle = function(self, unit)
 			self.Castbar:SetHeight(20)
 			self.Castbar:SetWidth(250)
 
-			self.Castbar:SetBackdrop({
-				bgFile = "Interface\ChatFrame\ChatFrameBackground",
-				insets = {top = -3, left = -3, bottom = -3, right = -3}})
+			self.Castbar:SetBackdrop(backdrop)
 
 			self.Castbar.SafeZone = self.Castbar:CreateTexture(nil,"ARTWORK")
 			self.Castbar.SafeZone:SetTexture(bartex)
@@ -729,9 +768,7 @@ local SetStyle = function(self, unit)
 			self.Castbar:SetHeight(20)
 			self.Castbar:SetWidth(250)
 
-			self.Castbar:SetBackdrop({
-				bgFile = "Interface\ChatFrame\ChatFrameBackground",
-				insets = {top = -3, left = -30, bottom = -3, right = -3}})
+			self.Castbar:SetBackdrop(backdrop)
 
 			self.Castbar:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -5)
 		end
@@ -759,16 +796,14 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- autoshot bar
 	-- ------------------------------------
-	if(IsAddOnLoaded('oUF_AutoShot') and playerClass == 'HUNTER' and unit == 'player') then
+	if(IsAddOnLoaded('oUF_AutoShot') and class == 'HUNTER' and unit == 'player') then
 		self.AutoShot = CreateFrame('StatusBar', nil, self)
 		self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
 		self.AutoShot:SetStatusBarTexture(bartex)
 		self.AutoShot:SetStatusBarColor(1, 0.7, 0)
 		self.AutoShot:SetHeight(6)
 		self.AutoShot:SetWidth(250)
-		self.AutoShot:SetBackdrop({
-			bgFile = "Interface\ChatFrame\ChatFrameBackground",
-			insets = {top = -3, left = -3, bottom = -3, right = -3}})
+		self.AutoShot:SetBackdrop(backdrop)
 		self.AutoShot:SetBackdropColor(0, 0, 0)
 
 		self.AutoShot.Text = self.AutoShot:CreateFontString(nil, 'OVERLAY')
