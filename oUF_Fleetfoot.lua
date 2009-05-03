@@ -472,7 +472,7 @@ local SetStyle = function(self, unit)
 	self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
 	self.Leader:SetHeight(12)
 	self.Leader:SetWidth(12)
-	self.Leader:SetPoint("BOTTOMRIGHT", self, 5, -2)¯
+	self.Leader:SetPoint("BOTTOMRIGHT", self, 5, -2)
 
 	-- ------------------------------------
 	-- player
@@ -518,45 +518,6 @@ local SetStyle = function(self, unit)
 		self.Debuffs.filter = "HARMFUL"
 		self.Debuffs.num = 10
 		self.Debuffs.spacing = 4
-
-
-		--
-		-- enchants
-		--
-		if IsAddOnLoaded('oUF_WeaponEnchant') then
-			self.Enchant = CreateFrame('Frame', nil, self)
-			self.Enchant:SetHeight(20 * 2)
-			self.Enchant:SetWidth(20)
-			self.Enchant:SetPoint('TOPLEFT', self, 'TOPRIGHT', 5, 2)
-			self.Enchant.size = 20
-			self.Enchant.spacing = 1
-			self.Enchant.initialAnchor = 'TOPLEFT'
-			self.Enchant['growth-y'] = 'DOWN'
-		end
-
-		if IsAddOnLoaded('oUF_RuneBar') and class == 'DEATHKNIGHT' then
-			self.RuneBar = {}
-			for i = 1, 6 do
-				self.RuneBar[i] = CreateFrame('StatusBar', self:GetName()..'_RuneBar'..i, self)
-				self.RuneBar[i]:SetHeight(7)
-				self.RuneBar[i]:SetWidth(250/6 - 0.85)
-				if (i == 1) then
-					self.RuneBar[i]:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -2)
-				else
-					self.RuneBar[i]:SetPoint('TOPLEFT', self.RuneBar[i-1], 'TOPRIGHT', 1, 0)
-				end
-				self.RuneBar[i]:SetStatusBarTexture(bartex)
-				self.RuneBar[i]:SetStatusBarColor(unpack(runeloadcolors[i]))
-				self.RuneBar[i]:SetBackdrop(backdrop)
-				self.RuneBar[i]:SetBackdropColor(0, 0, 0)
-				self.RuneBar[i]:SetMinMaxValues(0, 1)
-
-				self.RuneBar[i].bg = self.RuneBar[i]:CreateTexture(nil, 'BORDER')
-				self.RuneBar[i].bg:SetAllPoints(self.RuneBar[i])
-				self.RuneBar[i].bg:SetTexture(bartex)
-				self.RuneBar[i].bg:SetVertexColor(0.15, 0.15, 0.15)
-			end
-		end
 
 		self.PostCreateEnchantIcon = PostCreateAuraIcon
 
@@ -743,6 +704,7 @@ local SetStyle = function(self, unit)
 		self.PortraitOverlay:SetStatusBarTexture(unit == 'player' and normTex or revTex)
 		self.PortraitOverlay:SetStatusBarColor(0.25, 0.25, 0.25, 0.5)
 	end
+
 	-- ------------------------------------
 	-- player and target castbar
 	-- ------------------------------------
@@ -796,7 +758,7 @@ local SetStyle = function(self, unit)
 	-- ------------------------------------
 	-- autoshot bar
 	-- ------------------------------------
-	if(IsAddOnLoaded('oUF_AutoShot') and class == 'HUNTER' and unit == 'player') then
+	if IsAddOnLoaded('oUF_AutoShot') and class == 'HUNTER' and unit == 'player' then
 		self.AutoShot = CreateFrame('StatusBar', nil, self)
 		self.AutoShot:SetPoint('BOTTOMLEFT', self.Castbar, 'TOPLEFT', 0, 5)
 		self.AutoShot:SetStatusBarTexture(bartex)
@@ -815,6 +777,47 @@ local SetStyle = function(self, unit)
 		self.AutoShot.bg = self.AutoShot:CreateTexture(nil, 'BORDER')
 		self.AutoShot.bg:SetAllPoints(self.AutoShot)
 		self.AutoShot.bg:SetTexture(0.3, 0.3, 0.3)
+	end
+
+	-- ------------------------------------
+	-- enchants
+	-- ------------------------------------
+	if IsAddOnLoaded('oUF_WeaponEnchant') and unit == 'player' then
+		self.Enchant = CreateFrame('Frame', nil, self)
+		self.Enchant:SetHeight(20 * 2)
+		self.Enchant:SetWidth(20)
+		self.Enchant:SetPoint('TOPLEFT', self, 'TOPRIGHT', 5, 2)
+		self.Enchant.size = 20
+		self.Enchant.spacing = 1
+		self.Enchant.initialAnchor = 'TOPLEFT'
+		self.Enchant['growth-y'] = 'DOWN'
+	end
+
+	-- ------------------------------------
+	-- rune bar
+	-- ------------------------------------
+	if IsAddOnLoaded('oUF_RuneBar') and class == 'DEATHKNIGHT' and unit == 'player' then
+		self.RuneBar = {}
+		for i = 1, 6 do
+			self.RuneBar[i] = CreateFrame('StatusBar', self:GetName()..'_RuneBar'..i, self)
+			self.RuneBar[i]:SetHeight(7)
+			self.RuneBar[i]:SetWidth(250/6 - 0.85)
+			if (i == 1) then
+				self.RuneBar[i]:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -2)
+			else
+				self.RuneBar[i]:SetPoint('TOPLEFT', self.RuneBar[i-1], 'TOPRIGHT', 1, 0)
+			end
+			self.RuneBar[i]:SetStatusBarTexture(bartex)
+			self.RuneBar[i]:SetStatusBarColor(unpack(runeloadcolors[i]))
+			self.RuneBar[i]:SetBackdrop(backdrop)
+			self.RuneBar[i]:SetBackdropColor(0, 0, 0)
+			self.RuneBar[i]:SetMinMaxValues(0, 1)
+
+			self.RuneBar[i].bg = self.RuneBar[i]:CreateTexture(nil, 'BORDER')
+			self.RuneBar[i].bg:SetAllPoints(self.RuneBar[i])
+			self.RuneBar[i].bg:SetTexture(bartex)
+			self.RuneBar[i].bg:SetVertexColor(0.15, 0.15, 0.15)
+		end
 	end
 
 	-- ------------------------------------
