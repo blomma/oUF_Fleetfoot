@@ -34,7 +34,7 @@ local fontsize = 15
 local bartex = [=[Interface\AddOns\oUF_Fleetfoot\textures\statusbar]=]
 local bufftex = [=[Interface\AddOns\oUF_Fleetfoot\textures\border]=]
 local normTex = [=[Interface\Addons\oUF_Fleetfoot\textures\normTex]=]
-local revTex = [=[Interface\Addons\oUF_Fleetfoot\textures\revTex]=]
+local revTex = [=[Interface\Addons\oUF_Fleetfoot\textures\normTex]=]
 
 local class = select(2, UnitClass("player"))
 
@@ -68,6 +68,15 @@ local colors = setmetatable({
 		[4] = {0.84, 0.75, 0.65},
 	}, {__index = oUF.colors.runes}),
 }, {__index = oUF.colors})
+
+-- ------------------------------------------------------------------------
+-- these auras we dont need to see and are handled by my Filter addon instead
+-- ------------------------------------------------------------------------
+local auraFilter = {
+	[GetSpellInfo(34074)] = true, -- Hunter: Aspect of the Viper
+	[GetSpellInfo(61847)] = true, -- Hunter: Aspect of the Dragonhawk Rank 2
+	[GetSpellInfo(61609)] = true, -- Hunter, Vicious Viper
+}
 
 -- ------------------------------------------------------------------------
 -- right click
@@ -142,6 +151,7 @@ oUF.Tags['[diffcolor]']  = function(unit)
 	end
 	return format('|cff%02x%02x%02x', r*255, g*255, b*255)
 end
+
 oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 
 -- ------------------------------------------------------------------------
@@ -257,6 +267,14 @@ local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filt
 			icon.remaining:Hide()
 			icon:SetScript('OnUpdate', nil)
 		end
+	end
+end
+
+local function CustomAuraFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, caster)
+	if (auraFilter[name] and caster == 'player') then
+		return false
+	else
+		return true
 	end
 end
 
@@ -526,6 +544,8 @@ local SetStyle = function(self, unit)
 		--
 		self.PostCreateAuraIcon = PostCreateAuraIcon
 		self.PostUpdateAuraIcon = PostUpdateAuraIcon
+
+		self.CustomAuraFilter = CustomAuraFilter
 	end
 
 	-- ------------------------------------
@@ -714,7 +734,7 @@ local SetStyle = function(self, unit)
 		self.PortraitOverlay = CreateFrame('StatusBar', nil, self)
 		self.PortraitOverlay:SetFrameLevel(2)
 		self.PortraitOverlay:SetAllPoints(self.Portrait)
-		self.PortraitOverlay:SetStatusBarTexture(unit == 'player' and normTex or revTex)
+		self.PortraitOverlay:SetStatusBarTexture(normTex)
 		self.PortraitOverlay:SetStatusBarColor(0.25, 0.25, 0.25, 0.5)
 	end
 
