@@ -80,6 +80,7 @@ local auraFilter = {
 	[GetSpellInfo(5118)] = true, -- Hunter, Aspect of the Cheetah
 	[GetSpellInfo(13159)] = true, -- Hunter, Aspect of the Pack
 	[GetSpellInfo(49071)] = true, -- Hunter, Aspect of the Wild Rank 4
+	[GetSpellInfo(56344)] = true, -- Hunter, Lock and Load Rank 3
 }
 
 -- ------------------------------------------------------------------------
