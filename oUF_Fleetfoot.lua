@@ -76,6 +76,10 @@ local auraFilter = {
 	[GetSpellInfo(34074)] = true, -- Hunter: Aspect of the Viper
 	[GetSpellInfo(61847)] = true, -- Hunter: Aspect of the Dragonhawk Rank 2
 	[GetSpellInfo(61609)] = true, -- Hunter, Vicious Viper
+	[GetSpellInfo(13161)] = true, -- Hunter, Aspect of the Beast
+	[GetSpellInfo(5118)] = true, -- Hunter, Aspect of the Cheetah
+	[GetSpellInfo(13159)] = true, -- Hunter, Aspect of the Pack
+	[GetSpellInfo(49071)] = true, -- Hunter, Aspect of the Wild Rank 4
 }
 
 -- ------------------------------------------------------------------------
