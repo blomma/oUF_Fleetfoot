@@ -81,7 +81,7 @@ local auraFilter = {
 -- ------------------------------------------------------------------------
 -- right click
 -- ------------------------------------------------------------------------
-local menu = function(self)
+local function menu(self)
 	local unit = string.gsub(self.unit, '(.)', string.upper, 1)
 	if(_G[unit..'FrameDropDown']) then
 		ToggleDropDownMenu(1, nil, _G[unit..'FrameDropDown'], 'cursor')
@@ -98,7 +98,7 @@ end
 -- ------------------------------------------------------------------------
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
-local ShortValue = function(value)
+local function ShortValue(value)
 	if(value >= 1e6) then
 		return format('%dm', value / 1e6)
 	elseif(value >= 1e4) then
@@ -109,7 +109,7 @@ local ShortValue = function(value)
 end
 
 local day, hour, minute, tenseconds = 86400, 3600, 60, 10
-local GetFormattedTime = function(s)
+local function GetFormattedTime(s)
 	if s >= day then
 		return format('%dd', floor(s/day + 0.5)), s % day
 	elseif s >= hour then
@@ -157,7 +157,7 @@ oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 -- ------------------------------------------------------------------------
 -- health update
 -- ------------------------------------------------------------------------
-local PostUpdateHealth = function(self, event, unit, bar, min, max)
+local function PostUpdateHealth(self, event, unit, bar, min, max)
 	if(UnitIsDead(unit)) then
 		bar:SetValue(0)
 		if bar.value then
@@ -185,7 +185,7 @@ end
 -- ------------------------------------------------------------------------
 -- power update
 -- ------------------------------------------------------------------------
-local PostUpdatePower = function(self, event, unit, bar, min, max)
+local function PostUpdatePower(self, event, unit, bar, min, max)
 	local ptype, ptypestr = UnitPowerType(unit)
 	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
 		bar:SetValue(0)
@@ -208,7 +208,7 @@ end
 -- ------------------------------------------------------------------------
 -- aura
 -- ------------------------------------------------------------------------
-local UpdateAuraTimer = function(self,elapsed)
+local function UpdateAuraTimer(self,elapsed)
 	self.elapsed = self.elapsed + elapsed
 	if self.elapsed >= 0.1 then
 		self.timeLeft = self.timeLeft - self.elapsed
@@ -217,7 +217,7 @@ local UpdateAuraTimer = function(self,elapsed)
 	end
 end
 
-local PostCreateAuraIcon = function(self, button, icons, index, debuff)
+local function PostCreateAuraIcon(self, button, icons, index, debuff)
 	icons.showDebuffType = true
 
 	button.icon:SetTexCoord(.07, .93, .07, .93)
@@ -255,7 +255,7 @@ local PostCreateAuraIcon = function(self, button, icons, index, debuff)
 	end
 end
 
-local PostUpdateAuraIcon = function(self, icons, unit, icon, index, offset, filter, debuff)
+local function PostUpdateAuraIcon(self, icons, unit, icon, index, offset, filter, debuff)
 	if icons ~= self.Enchant then
 		local _, _, _, _, _, _, timeLeft, _ = UnitAura(unit, index, filter)
 		if(timeLeft > 0) then
@@ -278,7 +278,7 @@ local function CustomAuraFilter(icons, unit, icon, name, rank, texture, count, d
 	end
 end
 
-local HidePortrait = function(self, unit)
+local function HidePortrait(self, unit)
 	if (self.unit == 'target') then
 		if (not UnitExists(self.unit) or not UnitIsConnected(self.unit) or not UnitIsVisible(self.unit)) then
 			self.Portrait:SetAlpha(0)
@@ -309,7 +309,7 @@ local function shellsort(t, n, before)
     end
 end
 
-local sortTarget = function(a, b)
+local function sortTarget(a, b)
 	if(a.timeLeft == nil) then
 		return true
 	elseif(b.timeLeft == nil) then
@@ -319,7 +319,7 @@ local sortTarget = function(a, b)
 	end
 end
 
-local sortPlayer = function(a, b)
+local function sortPlayer(a, b)
 	if(a.timeLeft == 0) then
 		return true
 	elseif(b.timeLeft == 0) then
@@ -329,7 +329,7 @@ local sortPlayer = function(a, b)
 	end
 end
 
-local SetAuraPosition = function(self, icons, x)
+local function SetAuraPosition(self, icons, x)
 	if(icons and x > 0) then
 		if(icons.visibleDebuffs and self.unit == 'target') then
 			shellsort(icons, #icons, sortTarget)
@@ -380,7 +380,7 @@ TemporaryEnchantFrame:Hide()
 -- ------------------------------------------------------------------------
 -- the layout starts here
 -- ------------------------------------------------------------------------
-local SetStyle = function(self, unit)
+local function SetStyle(self, unit)
 	self.menu = menu
 	self.colors = colors
 
