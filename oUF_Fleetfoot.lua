@@ -551,16 +551,16 @@ local SetStyle = function(self, unit)
 		--
 		-- buffs
 		--
-		self.Buffs = CreateFrame("Frame", nil, self)
-		self.Buffs.size = 29
-		self.Buffs:SetHeight(self.Buffs.size)
-		self.Buffs:SetWidth(self.Buffs.size * 4)
-		self.Buffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -2, -5)
-		self.Buffs.initialAnchor = "TOPLEFT"
-		self.Buffs["growth-y"] = "DOWN"
-		self.Buffs.filter = false
-		self.Buffs.num = 20
-		self.Buffs.spacing = 2
+		self.Auras = CreateFrame("Frame", nil, self)
+		self.Auras.size = 22
+		self.Auras:SetHeight(self.Auras.size)
+		self.Auras:SetWidth(self.Auras.size * 5)
+		self.Auras:SetPoint("TOPLEFT", self, "BOTTOMLEFT", -2, -5)
+		self.Auras.initialAnchor = "TOPLEFT"
+		self.Auras["growth-y"] = "DOWN"
+		self.Auras.gap = true
+		self.Auras.num = 20
+		self.Auras.spacing = 2
 
 		--
 		-- combo points
@@ -627,16 +627,29 @@ local SetStyle = function(self, unit)
 		--
 		-- buffs
 		--
-		self.Buffs = CreateFrame("Frame", nil, self)
-		self.Buffs.size = 22
-		self.Buffs:SetHeight(self.Buffs.size)
-		self.Buffs:SetWidth(self.Buffs.size * 5)
-		self.Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -2, 15)
-		self.Buffs.initialAnchor = "BOTTOMLEFT"
-		self.Buffs["growth-y"] = "UP"
-		self.Buffs.filter = "HELPFUL"
-		self.Buffs.num = 40
-		self.Buffs.spacing = 2
+		-- self.Buffs = CreateFrame("Frame", nil, self)
+		-- self.Buffs.size = 22
+		-- self.Buffs:SetHeight(self.Buffs.size)
+		-- self.Buffs:SetWidth(self.Buffs.size * 5)
+		-- self.Buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -2, 15)
+		-- self.Buffs.initialAnchor = "BOTTOMLEFT"
+		-- self.Buffs["growth-y"] = "UP"
+		-- self.Buffs.filter = "HELPFUL"
+		-- self.Buffs.num = 40
+		-- self.Buffs.spacing = 2
+
+		--
+		-- buffs
+		--
+		self.Auras = CreateFrame("Frame", nil, self)
+		self.Auras.size = 22
+		self.Auras:SetHeight(self.Auras.size)
+		self.Auras:SetWidth(self.Auras.size * 5)
+		self.Auras:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -2, 15)
+		self.Auras.initialAnchor = "BOTTOMLEFT"
+		self.Auras["growth-y"] = "UP"
+		self.Auras.num = 40
+		self.Auras.spacing = 2
 
 		--
 		-- debuffs
@@ -867,7 +880,7 @@ oUF:SetActiveStyle("Fleetfoot")
 
 oUF:Spawn("player", "oUF_Player"):SetPoint("CENTER", -280, -206)
 oUF:Spawn("target", "oUF_Target"):SetPoint("CENTER", 280, -206)
-oUF:Spawn("pet", "oUF_Pet"):SetPoint("BOTTOMLEFT", oUF.units.player, 0, -30)
+oUF:Spawn("pet", "oUF_Pet"):SetPoint("BOTTOMLEFT", oUF.units.player, 0, -35)
 oUF:Spawn("targettarget", "oUF_TargetTarget"):SetPoint("TOPRIGHT", oUF.units.target, 0, 35)
 oUF:Spawn("focus", "oUF_Focus"):SetPoint("BOTTOMRIGHT", oUF.units.player, 0, -30)
 
