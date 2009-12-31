@@ -83,9 +83,10 @@ local auraFilter = {
 -- ------------------------------------------------------------------------
 local function menu(self)
 	local unit = string.gsub(self.unit, '(.)', string.upper, 1)
-	if(_G[unit..'FrameDropDown']) then
+
+	if _G[unit..'FrameDropDown'] then
 		ToggleDropDownMenu(1, nil, _G[unit..'FrameDropDown'], 'cursor')
-	elseif(self.unit:match('party')) then
+	elseif self.unit:match('party') then
 		ToggleDropDownMenu(1, nil, _G['PartyMemberFrame'..self.id..'DropDown'], 'cursor')
 	else
 		FriendsDropDown.unit = self.unit
@@ -99,9 +100,9 @@ end
 -- reformat everything above 9999, i.e. 10000 -> 10k
 -- ------------------------------------------------------------------------
 local function ShortValue(value)
-	if(value >= 1e6) then
+	if value >= 1e6 then
 		return format('%dm', value / 1e6)
-	elseif(value >= 1e4) then
+	elseif value >= 1e4 then
 		return format('%dk', value / 1e3)
 	else
 		return value
@@ -158,23 +159,23 @@ oUF.TagEvents['[diffcolor]'] = 'UNIT_LEVEL'
 -- health update
 -- ------------------------------------------------------------------------
 local function PostUpdateHealth(self, event, unit, bar, min, max)
-	if(UnitIsDead(unit)) then
+	if UnitIsDead(unit) then
 		bar:SetValue(0)
 		if bar.value then
 			bar.value:SetText("Dead")
 		end
-	elseif(UnitIsGhost(unit)) then
+	elseif UnitIsGhost(unit) then
 		bar:SetValue(0)
 		if bar.value then
 			bar.value:SetText("Ghost")
 		end
-	elseif(not UnitIsConnected(unit)) then
+	elseif not UnitIsConnected(unit) then
 		bar:SetValue(0)
 		if bar.value then
 			bar.value:SetText("Offline")
 		end
-	elseif(unit == "player" or unit=="target" or unit=="pet") then
-		if(min ~= max) then
+	elseif unit == "player" or unit=="target" or unit=="pet" then
+		if min ~= max then
 			bar.value:SetFormattedText('|cff33EE44%s|r.%d%%', ShortValue(min), floor(min/max*100))
 		else
 			bar.value:SetText()
@@ -187,17 +188,19 @@ end
 -- ------------------------------------------------------------------------
 local function PostUpdatePower(self, event, unit, bar, min, max)
 	local ptype, ptypestr = UnitPowerType(unit)
-	if(UnitIsDead(unit) or UnitIsGhost(unit)) then
+
+	if UnitIsDead(unit) or UnitIsGhost(unit) then
 		bar:SetValue(0)
-	elseif(not UnitIsConnected(unit)) then
+	elseif not UnitIsConnected(unit) then
 		if bar.value then
 			bar.value:SetText()
 		end
-	elseif(unit=="player" or unit=="pet") then
+	elseif unit=="player" or unit=="pet" then
 		local r,g,b = unpack(oUF.colors.power[ptypestr])
-		if(min==max or (ptype==6 and min == 0)) then
+
+		if min == max or (ptype == 6 and min == 0) then
 			bar.value:SetText()
-		elseif(ptype==1 or ptype==3 or ptype==6 or ptype==2) then
+		elseif ptype == 1 or ptype == 3 or ptype == 6 or ptype == 2 then
 			bar.value:SetFormattedText('|cff%02x%02x%02x%s|r', r * 255, g * 255, b * 255, ShortValue(min))
 		else
 			bar.value:SetFormattedText('|cff%02x%02x%02x%s|r.%d%%', r * 255, g * 255, b * 255, ShortValue(min), floor(min/max*100))
@@ -232,7 +235,7 @@ local function PostCreateAuraIcon(self, button, icons, index, debuff)
 	cd.noOCC = true
 	cd.noCooldownCount = true
 
-	if (self.unit == 'player') then
+	if self.unit == 'player' then
 		button:SetScript('OnMouseUp', function(self, mouseButton)
 			if mouseButton == 'RightButton' and not self.debuff then
 				CancelUnitBuff('player', self:GetID())
@@ -258,7 +261,8 @@ end
 local function PostUpdateAuraIcon(self, icons, unit, icon, index, offset, filter, debuff)
 	if icons ~= self.Enchant then
 		local _, _, _, _, _, _, timeLeft, _ = UnitAura(unit, index, filter)
-		if(timeLeft > 0) then
+
+		if timeLeft > 0 then
 			icon.timeLeft = timeLeft - GetTime()
 			icon.elapsed = 0
 			icon.remaining:Show()
@@ -271,7 +275,7 @@ local function PostUpdateAuraIcon(self, icons, unit, icon, index, offset, filter
 end
 
 local function CustomAuraFilter(icons, unit, icon, name, rank, texture, count, dtype, duration, expiration, caster)
-	if (auraFilter[name] and caster == 'player') then
+	if auraFilter[name] and caster == 'player' then
 		return false
 	else
 		return true
@@ -279,8 +283,8 @@ local function CustomAuraFilter(icons, unit, icon, name, rank, texture, count, d
 end
 
 local function HidePortrait(self, unit)
-	if (self.unit == 'target') then
-		if (not UnitExists(self.unit) or not UnitIsConnected(self.unit) or not UnitIsVisible(self.unit)) then
+	if self.unit == 'target' then
+		if not UnitExists(self.unit) or not UnitIsConnected(self.unit) or not UnitIsVisible(self.unit) then
 			self.Portrait:SetAlpha(0)
 		else
 			self.Portrait:SetAlpha(1)
@@ -291,85 +295,85 @@ end
 -- ------------------------------------------------------------------------
 -- aura sorting
 -- ------------------------------------------------------------------------
-local incs = { 23, 10, 4, 1 }
-local incsCount = #incs
-local function shellsort(t, n, before)
-	for ii=1,incsCount do
-		local h = incs[ii]
-		for i = h + 1, n do
-			local v = t[i]
-			for j = i - h, 1, -h do
-				local testval = t[j]
-				if not before(v, testval) then break end
-				t[i] = testval
-				i = j
-			end
-			t[i] = v
-		end
-    end
-end
-
-local function sortTarget(a, b)
-	if(a.timeLeft == nil) then
-		return true
-	elseif(b.timeLeft == nil) then
-		return false
-	else
-		return a.timeLeft > b.timeLeft
-	end
-end
-
-local function sortPlayer(a, b)
-	if(a.timeLeft == 0) then
-		return true
-	elseif(b.timeLeft == 0) then
-		return false
-	else
-		return a.timeLeft > b.timeLeft
-	end
-end
-
-local function SetAuraPosition(self, icons, x)
-	if(icons and x > 0) then
-		if(icons.visibleDebuffs and self.unit == 'target') then
-			shellsort(icons, #icons, sortTarget)
-		end
-
-		local col = 0
-		local row = 0
-		local spacing = icons.spacing or 0
-		local gap = icons.gap
-		local size = (icons.size or 16) + spacing
-		local anchor = icons.initialAnchor or "BOTTOMLEFT"
-		local growthx = (icons["growth-x"] == "LEFT" and -1) or 1
-		local growthy = (icons["growth-y"] == "DOWN" and -1) or 1
-		local cols = math.floor(icons:GetWidth() / size + .5)
-		local rows = math.floor(icons:GetHeight() / size + .5)
-
-		for i = 1, x do
-			local button = icons[i]
-			if(button and button:IsShown()) then
-				if(gap and button.debuff) then
-					if(col > 0) then
-						col = col + 1
-					end
-
-					gap = false
-				end
-
-				if(col >= cols) then
-					col = 0
-					row = row + 1
-				end
-
-				button:ClearAllPoints()
-				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
-
-				col = col + 1
-			end
-		end
-	end
-end
+-- local incs = { 23, 10, 4, 1 }
+-- local incsCount = #incs
+-- local function shellsort(t, n, before)
+-- 	for ii=1,incsCount do
+-- 		local h = incs[ii]
+-- 		for i = h + 1, n do
+-- 			local v = t[i]
+-- 			for j = i - h, 1, -h do
+-- 				local testval = t[j]
+-- 				if not before(v, testval) then break end
+-- 				t[i] = testval
+-- 				i = j
+-- 			end
+-- 			t[i] = v
+-- 		end
+--     end
+-- end
+-- 
+-- local function sortTarget(a, b)
+-- 	if(a.timeLeft == nil) then
+-- 		return true
+-- 	elseif(b.timeLeft == nil) then
+-- 		return false
+-- 	else
+-- 		return a.timeLeft > b.timeLeft
+-- 	end
+-- end
+-- 
+-- local function sortPlayer(a, b)
+-- 	if(a.timeLeft == 0) then
+-- 		return true
+-- 	elseif(b.timeLeft == 0) then
+-- 		return false
+-- 	else
+-- 		return a.timeLeft > b.timeLeft
+-- 	end
+-- end
+-- 
+-- local function SetAuraPosition(self, icons, x)
+-- 	if(icons and x > 0) then
+-- 		if(icons.visibleDebuffs and self.unit == 'target') then
+-- 			shellsort(icons, #icons, sortTarget)
+-- 		end
+-- 
+-- 		local col = 0
+-- 		local row = 0
+-- 		local spacing = icons.spacing or 0
+-- 		local gap = icons.gap
+-- 		local size = (icons.size or 16) + spacing
+-- 		local anchor = icons.initialAnchor or "BOTTOMLEFT"
+-- 		local growthx = (icons["growth-x"] == "LEFT" and -1) or 1
+-- 		local growthy = (icons["growth-y"] == "DOWN" and -1) or 1
+-- 		local cols = math.floor(icons:GetWidth() / size + .5)
+-- 		local rows = math.floor(icons:GetHeight() / size + .5)
+-- 
+-- 		for i = 1, x do
+-- 			local button = icons[i]
+-- 			if(button and button:IsShown()) then
+-- 				if(gap and button.debuff) then
+-- 					if(col > 0) then
+-- 						col = col + 1
+-- 					end
+-- 
+-- 					gap = false
+-- 				end
+-- 
+-- 				if(col >= cols) then
+-- 					col = 0
+-- 					row = row + 1
+-- 				end
+-- 
+-- 				button:ClearAllPoints()
+-- 				button:SetPoint(anchor, icons, anchor, col * size * growthx, row * size * growthy)
+-- 
+-- 				col = col + 1
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 -- ------------------------------------------------------------------------
 -- remove the blizz frames
@@ -495,7 +499,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- player
 	-- ------------------------------------
-	if(unit == "player") then
+	if unit == "player" then
 		self:SetWidth(250)
 		self:SetHeight(46)
 
@@ -551,7 +555,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- pet
 	-- ------------------------------------
-	if(unit == "pet") then
+	if unit == "pet" then
 		self:SetWidth(120)
 		self:SetHeight(20)
 
@@ -562,7 +566,7 @@ local function SetStyle(self, unit)
 		self.Power.value:SetJustifyH("LEFT")
 		self.Power.frequentUpdates = 0.1
 
-		if(class == "HUNTER") then
+		if class == "HUNTER" then
 			self.Health.colorReaction = false
 			self.Health.colorClass = false
 			self.Health.colorHappiness = true
@@ -601,7 +605,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- target
 	-- ------------------------------------
-	if(unit == "target") then
+	if unit == "target" then
 		self:SetWidth(250)
 		self:SetHeight(46)
 
@@ -700,7 +704,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- target of target and focus
 	-- ------------------------------------
-	if(unit == "targettarget" or unit == "focus") then
+	if unit == "targettarget" or unit == "focus" then
 		self.Power:Hide()
 
 		self:SetWidth(120)
@@ -724,7 +728,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- player and target portrait
 	-- ------------------------------------
-	if(unit == 'player' or unit == 'target') then
+	if unit == 'player' or unit == 'target' then
 		self.Portrait = CreateFrame('PlayerModel', nil, self)
 		self.Portrait:SetFrameLevel(1)
 		self.Portrait:SetPoint('TOPLEFT', self.Health, 'BOTTOMLEFT', 0, -1.5)
@@ -741,11 +745,11 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- player and target castbar
 	-- ------------------------------------
-	if(unit == 'player' or unit == 'target') then
+	if unit == 'player' or unit == 'target' then
 		self.Castbar = CreateFrame('StatusBar', nil, self)
 		self.Castbar:SetStatusBarTexture(bartex)
 
-		if(unit == "player") then
+		if unit == "player" then
 			self.Castbar:SetStatusBarColor(1, 0.50, 0)
 			self.Castbar:SetHeight(20)
 			self.Castbar:SetWidth(250)
@@ -835,7 +839,7 @@ local function SetStyle(self, unit)
 			self.RuneBar[i] = CreateFrame('StatusBar', self:GetName()..'_RuneBar'..i, self)
 			self.RuneBar[i]:SetHeight(7)
 			self.RuneBar[i]:SetWidth(250/6 - 0.85)
-			if (i == 1) then
+			if i == 1 then
 				self.RuneBar[i]:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -2)
 			else
 				self.RuneBar[i]:SetPoint('TOPLEFT', self.RuneBar[i-1], 'TOPRIGHT', 1, 0)
@@ -856,7 +860,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- party
 	-- ------------------------------------
-	if(self:GetParent():GetName():match("oUF_Party")) then
+	if self:GetParent():GetName():match("oUF_Party") then
 		self:SetWidth(50)
 		self:SetHeight(17.5)
 
@@ -870,7 +874,7 @@ local function SetStyle(self, unit)
 	-- ------------------------------------
 	-- raid
 	-- ------------------------------------
-	if(self:GetParent():GetName():match("oUF_Raid")) then
+	if self:GetParent():GetName():match("oUF_Raid") then
 		self:SetWidth(50)
 		self:SetHeight(17.5)
 
@@ -943,11 +947,11 @@ partyToggle:RegisterEvent('RAID_ROSTER_UPDATE')
 partyToggle:RegisterEvent('PARTY_LEADER_CHANGED')
 partyToggle:RegisterEvent('PARTY_MEMBER_CHANGED')
 partyToggle:SetScript('OnEvent', function(self)
-	if(InCombatLockdown()) then
+	if InCombatLockdown() then
 		self:RegisterEvent('PLAYER_REGEN_ENABLED')
 	else
 		self:UnregisterEvent('PLAYER_REGEN_DISABLED')
-		if(UnitInRaid("player")) then
+		if UnitInRaid("player") then
 			party:Hide()
 		else
 			party:Show()
